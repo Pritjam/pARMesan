@@ -4,6 +4,7 @@
 
 Contents:
 - [Registers](#registers)
+- [Memory](#memory)
 
 ### Registers
 There are 8 general-purpose registers in this architecture. Each is one word, or 16 bits wide. These are labeled `%ax`, `%bx`, `%cx`, `%dx`, `%bp`, `%si`, `%di`, `%sp`. The first 4 are intended to be used for general data operations, while the other four are intended for more specific use something along the lines of x86’s registers: Source Index, Destination Index, Base Pointer, and Stack Pointer. As they are all General Purpose Registers, any register can be used in any data movement or ALU operation. The only special cases are the Call and Return instructions, as they specifically use `%sp` to push/pop a return address on the stack.
