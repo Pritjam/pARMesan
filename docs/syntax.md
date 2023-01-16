@@ -15,3 +15,7 @@ In this ISA, many operands of assembly instructions involve memory or registers.
   - Pre-Indexed: `[<Rs>, #imm]!`
   - Post-Indexed: `[<Rs>], #imm`
 - Labels (jump targets) are denoted by .LABEL. 
+
+---
+
+[Table of Contents](index.md)

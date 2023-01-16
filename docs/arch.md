@@ -17,3 +17,7 @@ These shadow registers are intended to be used with interrupt handling, as they 
 
 ### Memory
 Memory is word-addressed. 64K addresses are possible, meaning this CPU can address up to 128KB of RAM, arranged as 64Kx16. Memory accesses are assumed to be fast enough that there is no pipeline delay imposed on the system. This is consistent with older 16-bit CPUs such as the Intel 8086, which lacked any onboard cache.
+
+---
+
+[Table of Contents](index.md)

@@ -41,3 +41,7 @@ There are more possible features that could be added. Below are a few contenders
 - **Floating Point Support** - Instructions that can do floating-point math. This would likely also involve designing an FPU, like how the 8086 paired with the 8087.
 - **Extended Register Operations** - Instructions that make use of register pairs, like the 8080's `BC`, `DE`, and `HL` register pairs. This would allow for 32-bit computing.
 - **Memory Segmentation** - Rework the memory architecture to use segmentation, as introduced with the 8086, to expand addressable range. 
+
+---
+
+[Table of Contents](index.md)

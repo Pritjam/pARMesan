@@ -6,7 +6,7 @@ This is the official documentation for the pARMesan architecture. Contents inclu
 - [Overview](overview.md)
 - [Versioning](versioning.md)
 - [Syntax](syntax.md)
-- [Architecture]()
+- [Architecture](arch.md)
 
 ---
 
