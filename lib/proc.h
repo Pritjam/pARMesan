@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "system.h"
+#include "instr.h"
 
 #define INITIAL_IP 0
 
@@ -38,5 +39,13 @@ typedef struct proc {
 } proc_t;
 
 extern proc_t init_proc();
+extern void fetch(proc_t *, instr_t *);
+extern void decode(proc_t *, instr_t *);
+extern void execute(proc_t *, instr_t *);
+extern void memory(proc_t *, instr_t *);
+extern void writeback(proc_t *, instr_t *);
+
+alu_op_t determine_alu_op(opcode_t, int);
+uint16_t get_immediate(uint16_t, opcode_t);
 
 #endif
