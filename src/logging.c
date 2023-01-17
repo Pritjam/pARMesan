@@ -6,13 +6,12 @@
 
 #include "ansicolors.h"
 
-#define BUF_LEN \
-  100  // up to 100 characters can be printed. Should fit any print.
+// up to 100 characters can be printed. Should fit any print.
+#define BUF_LEN 100
 
-static char *severity_strs[LOG_FATAL + 2] = {"DEBUG", "INFO", "WARN", "FATAL",
-                                             "OUTPUT"};
+static char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
 
-static char *severity_colors[LOG_FATAL + 2] = {
+static char *severity_colors[] = {
     ANSI_COLOR_MAGENTA,        // debug
     ANSI_COLOR_CYAN,           // info
     ANSI_COLOR_YELLOW,         // warn
