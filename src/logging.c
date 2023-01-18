@@ -30,8 +30,8 @@ static char *format_log_message(log_level severity, char *message) {
   return printbuf;
 }
 
-int log_msg(log_level level, char *message, int log_verbosity) {
-  if (log_verbosity < verbosity) {
+int log_msg(log_level level, char *message) {
+  if(level < verbosity) {
     return 0;
   }
   FILE *out;

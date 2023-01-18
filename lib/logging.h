@@ -1,18 +1,21 @@
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 
+#define VERBOSITY_MAX 2
+
 extern int verbosity;
+
 
 /* This enum represents the various levels used by the logging system. */
 typedef enum {
-  LOG_DEBUG, // print a message to the console
-  LOG_INFO,  // print a warning message and ignore the current input
-  LOG_WARN,  // print an error message and ignore the current input
-  LOG_FATAL, // print an error message and terminate the program
-  LOG_OUTPUT,
+  LOG_DEBUG, // Debug messages (specifically for debugging)
+  LOG_INFO,  // Info messages (startup, loading, etc)
+  LOG_WARN,  // Warnings (nullptr reads, simultaneous r/w, etc)
+  LOG_FATAL, // Unrecoverable errors (terminates execution)
+  LOG_OUTPUT,// Program output (yet to be implemented)
   LOG_OTHER = -1 // should not be used
 } log_level;
 
-extern int log_msg(log_level, char *, int level);
+extern int log_msg(log_level lvl, char *msg);
 
 #endif
