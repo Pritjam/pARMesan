@@ -101,11 +101,36 @@ typedef enum alu_op {
   ALU_VLSR_NYBL,
   ALU_MOVL,
   ALU_MOVH,
+  ALU_PASS_B,
   ALU_NONE,
   ALU_ERR = -1
 } alu_op_t;
 
+typedef enum wval_src {
+  ALU_OUTPUT,
+  VAL_MEM,
+  SEQUENTIAL_SUCCESSOR
+} wval_src_t;
+
 typedef struct ctrl_sigs {
+  // consumed in Decode
+  bool val_a_sel; // if true, val_a comes from src, else from dst
+                  // this is the case only in load/store instrs, as
+                  // the ALU source is not the same as the data source/dst
+  
+  bool val_b_is_imm; // if true, ALU second operand is immediate
+
+  // consumed in Execute
+  bool set_cc;
+
+  // consumed in Memory
+  bool mem_read;
+  bool mem_write;
+
+  // consumed in Writeback
+  bool wval_1_src; // Choose where to get primary wval from. If true, get from ALU. If false, get from memory output.
+  bool w_enable_1;
+  bool w_enable_2;
 } ctrl_sigs_t;
 
 typedef enum condition_code { EQ, NE, GE, GT, LT, LE, CC, CS } condition_code_t;
@@ -116,10 +141,11 @@ typedef struct instr {
 
   // generated in Decode
   opcode_t op;            // opcode of the instruction
-  uint16_t val_a;         // ALU's first value
-  uint16_t val_b;         // ALU's second value
+  uint16_t mem_writeval;  // value to be written to mem
+  uint16_t opnd_1;        // ALU's first value
+  uint16_t opnd_2;        // ALU's second value
   alu_op_t alu_op;        // ALU operation to perform
-  condition_code_t cc;    // condition code for ALU to check
+  condition_code_t cond;  // condition code for ALU to check
   int dst1;               // first writeback destination
   int dst2;               // second writeback destination
   uint16_t branch_pc;     // next instruction address in case of a branch
