@@ -51,8 +51,7 @@ int main(int argc, char *argv[]) {
   FILE *assembly_file = fopen(filename, "r");
   free(filename);
   if (assembly_file == NULL) {
-    log_msg(LOG_FATAL, "Error while attempting to open assembly file",
-            VERBOSITY_MAX);
+    log_msg(LOG_FATAL, "Error while attempting to open assembly file");
   }
 
   // Having opened the file, now we need to initialize system
@@ -65,14 +64,13 @@ int main(int argc, char *argv[]) {
   // initialize ram and link it to the sysbus (at this time, no need for encapsulation of mem within a struct)
   uint16_t *mem = (uint16_t *) calloc(ADDRESS_SPACE_SIZE, sizeof(uint16_t));
   if (mem == NULL) {
-    log_msg(LOG_FATAL, "Failed to allocate space for emulated memory", VERBOSITY_MAX);
+    log_msg(LOG_FATAL, "Failed to allocate space for emulated memory");
   }
   sys.memory = mem;
   //mem.bus = &sys;
 
   // any other system init tasks go here
-  // initialize itable
-
+  
   // main CPU loop goes here
 
   // closing remarks go here
