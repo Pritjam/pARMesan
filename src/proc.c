@@ -145,10 +145,14 @@ alu_op_t determine_alu_op(opcode_t op, int h) {
   switch(op) {
     case LOAD_BO: case LOAD_PRE: case LOAD_POST: 
     case STORE_BO: case STORE_PRE: case STORE_POST:
-    case ADD: case ADC: case IADD:
+    case ADD: case IADD:
       return ALU_PLUS;
-    case SUB: case CMP: case SBC: case ISUB: case ICMP:
+    case ADC:
+      return ALU_ADC;
+    case SUB: case CMP: case ISUB: case ICMP:
       return ALU_MINUS;
+    case SBC:
+      return ALU_SBC;
     case AND: case TEST: case IAND:
       return ALU_AND;
     case OR: case IOR:
@@ -249,7 +253,6 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
 void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uint16_t *ex_val, flags_t *flags) {
   // get the actual value
-  // TODO: figure out what to do with ADC/SBC, do we just make those separate ALU ops? that's probably the best way to do it
   switch(alu_op) {
     case ALU_PLUS:
       *ex_val = opnd_1 + opnd_2;
@@ -306,6 +309,11 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     case ALU_PASS_B:
       *ex_val = opnd_2;
       break;
+    case ALU_ADC:
+      *ex_val = opnd_1 + opnd_2 + flags->C;
+      break;
+    case ALU_SBC:
+      *ex_val = opnd_1 - (opnd_2 + flags->C);
     case ALU_NONE:
       break;
   }

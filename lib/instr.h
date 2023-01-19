@@ -99,6 +99,8 @@ typedef enum alu_op {
   ALU_VLSL_NYBL,
   ALU_VLSR_BYTE,
   ALU_VLSR_NYBL,
+  ALU_ADC,
+  ALU_SBC,
   ALU_MOVL,
   ALU_MOVH,
   ALU_PASS_B,
