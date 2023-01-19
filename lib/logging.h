@@ -1,9 +1,9 @@
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 
-#define VERBOSITY_MAX 2
+#define VERBOSITY_MAX LOG_FATAL
 
-extern int verbosity;
+extern int global_verbosity;
 
 
 /* This enum represents the various levels used by the logging system. */

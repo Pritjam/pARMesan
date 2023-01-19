@@ -10,7 +10,7 @@
 #include "system.h"
 #include "binloader.h"
 
-int verbosity = 1;
+int global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
 
 int main(int argc, char *argv[]) {
   int opt;
@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
   while ((opt = getopt(argc, argv, "v:f:h")) != -1) {
     switch (opt) {
       case 'v':
-        verbosity = *optarg - '0';
-        if (verbosity < 0 || verbosity > VERBOSITY_MAX) {
-          printf("Verbosity must be between 0 and %d\n", VERBOSITY_MAX);
+        global_verbosity = *optarg - '0';
+        if (global_verbosity < 0 || global_verbosity > VERBOSITY_MAX) {
+          printf("Verbosity must be at least 0 and at most %d\n", VERBOSITY_MAX);
           exit(-1);
         }
         break;

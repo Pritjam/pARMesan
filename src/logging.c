@@ -30,12 +30,12 @@ static char *format_log_message(log_level severity, char *message) {
   return printbuf;
 }
 
-int log_msg(log_level level, char *message) {
-  if(level < verbosity) {
+int log_msg(log_level severity, char *message) {
+  if(severity < global_verbosity) {
     return 0;
   }
   FILE *out;
-  switch (level) {
+  switch (severity) {
     case LOG_DEBUG:
     case LOG_INFO:
     case LOG_WARN:
@@ -50,5 +50,5 @@ int log_msg(log_level level, char *message) {
     case LOG_OTHER:
       break;
   }
-  return fprintf(out, "%s\n", format_log_message(level, message));
+  return fprintf(out, "%s\n", format_log_message(severity, message));
 }
