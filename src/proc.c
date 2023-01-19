@@ -83,6 +83,7 @@ void execute(proc_t *proc, instr_t *instr) {
   // make a call to ALU
   run_alu(instr->opnd_1, instr->opnd_2, instr->alu_op, instr->ctrl_sigs.set_cc, &instr->ex_val, &proc->flags);
   // determine if condition holds
+  // TODO: Write check_cond fn
   // instr->cond_holds = check_cond(instr->cond, proc->flags);
 
 }
@@ -105,8 +106,9 @@ void memory(proc_t *proc, instr_t *instr) {
     log_msg(LOG_WARN, "Simultaneous load and store");
   }
   if(instr->ctrl_sigs.mem_write) {
+    // TODO: This needs to be reworked for a neater system eventually
     if(mem_address == MMIO_PRINT_ADDRESS) {
-      char msg[100];
+      char msg[40];
       sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
       log_msg(LOG_OUTPUT, msg);
     }
@@ -138,6 +140,10 @@ void writeback(proc_t *proc, instr_t *instr) {
     proc->instruction_pointer = instr->branch_pc;
   } else {
     proc->instruction_pointer += 1;
+  }
+
+  if(instr->op == HLT) {
+    proc->status = STAT_HALT;
   }
 }
 
@@ -199,8 +205,8 @@ uint16_t get_immediate(uint16_t insnbits, opcode_t op) {
     return extract_unsigned_immediate(insnbits, 3, 8);
   }
 
-  if(op == MOVH || op == ALU_MOVL) {
-    return extract_unsigned_immediate(insnbits, 0, 8);
+  if(op == MOVH || op == MOVL) {
+    return extract_unsigned_immediate(insnbits, 3, 8);
   }
 
   if(op == INT) {
