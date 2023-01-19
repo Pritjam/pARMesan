@@ -8,6 +8,7 @@
 #include "logging.h"
 #include "proc.h"
 #include "system.h"
+#include "binloader.h"
 
 int verbosity = 1;
 
@@ -50,8 +51,9 @@ int main(int argc, char *argv[]) {
   // now that args are handled, we need to load the file
   FILE *assembly_file = fopen(filename, "r");
   free(filename);
+  log_msg(LOG_INFO, "Loading binary file now");
   if (assembly_file == NULL) {
-    log_msg(LOG_FATAL, "Error while attempting to open assembly file");
+    log_msg(LOG_FATAL, "Error while attempting to open assembly file. Check name.");
   }
 
   // Having opened the file, now we need to initialize system
@@ -70,8 +72,17 @@ int main(int argc, char *argv[]) {
   //mem.bus = &sys;
 
   // any other system init tasks go here
+  instr_t instr;
+  load_binary(mem, assembly_file);
   
   // main CPU loop goes here
+  while(proc.status != STAT_HALT) {
+    fetch(&proc, &instr);
+    decode(&proc, &instr);
+    execute(&proc, &instr);
+    memory(&proc, &instr);
+    writeback(&proc, &instr);
+  }
 
   // closing remarks go here
   free(mem);
