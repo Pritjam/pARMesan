@@ -15,7 +15,23 @@ void load_binary(uint16_t *emulated_mem, FILE *file) {
   }
 
   // read the file in
-  fread(emulated_mem, sizeof(uint16_t), size / sizeof(uint16_t), file);
+  // TODO: ENDIANNESS!!! This is massively unsafe because endianness exists!
+  // There's a standard for the file's byte order, sure 
+    // (the pARMesan standard, while not written yet, will likely specify big-endian)
+  // However, the endianness of the machine running this emulator CANNOT be assumed.
+  // This read has to be done in a safe way.
+  // fread(emulated_mem, sizeof(uint16_t), size / sizeof(uint16_t), file);
+
+  // Hacky workaround: Read it as an array of bytes, then manually make uint16s. This is not a good way to do this.
+  fread(emulated_mem, sizeof(uint8_t), size / sizeof(uint8_t), file);
+  uint8_t *mem_byte_ptr = (uint8_t *) emulated_mem;
+  for(long i = 0; i < size; i += 2) {
+    uint8_t high_byte = mem_byte_ptr[i];
+    uint8_t low_byte = mem_byte_ptr[i + 1];
+    uint16_t instr_word = ((uint16_t) high_byte) << 8;
+    instr_word |= low_byte;
+    emulated_mem[i / 2] = instr_word;
+  }
 
   
 }
