@@ -2,14 +2,11 @@ from bitstring import BitArray
 import re
 import lookups
 
-# All ALU_RR type instructions.
-# These are ALU operations with two register operands.
-class alu_rr:
+class alu:
   @staticmethod
-  def parse(insn):
+  def _parse_alu_rr(toks):
     # Passed an instruction looking like
-    #   ADD %ax, %bx
-    toks = re.split(", |,| ", insn)
+    #   ['ADD',  '%ax', '%bx']
     op = toks[0]
     opbits = BitArray(uint=0b00001, length=5)
     alu_opbits = BitArray(uint=lookups.ALU_RR_ALU_OPBITS[op], length=4)
@@ -19,14 +16,8 @@ class alu_rr:
     dst, src = BitArray(uint=dst, length=3), BitArray(uint=dst, length=3)
     return opbits + alu_opbits + h + src + dst
 
-# All ALU_RI type instructions.
-# These are ALU operations with one register operand and one immediate operand.
-class alu_ri:
   @staticmethod
-  def parse(insn):
-    # Passed an instruction looking like
-    #   ADD %ax, #8
-    toks = re.split(", |,| ", insn)
+  def _parse_alu_ri(toks):
     op = toks[0]
     opbits = BitArray(uint=0b00010, length=5)
     alu_opbits = BitArray(uint=lookups.ALU_RI_ALU_OPBITS[op], length=3)
@@ -38,6 +29,14 @@ class alu_ri:
     dst = BitArray(uint=dst, length=3)
     return opbits + alu_opbits + h + imm + dst
 
+  @staticmethod
+  def parse(insn):
+    toks = re.split(", |,| ", insn)
+    if toks[-1].startswith("%"):
+      return alu._parse_alu_rr(toks)
+    else:
+      return alu._parse_alu_ri(toks)
+
 
 # MOVH and MOVL instrs.
 class mov_hl:
@@ -47,7 +46,7 @@ class mov_hl:
     #   MOVL %di, $FF
     toks = re.split(", |,| ", insn)
     op = toks[0]
-    opbits = BitArray(uint=0b1100, length=5) if op == "MOVL" else BitArray(uint=0b1101, length=5)
+    opbits = BitArray(uint=0b1100, length=5) if op == "movl" else BitArray(uint=0b1101, length=5)
     imm = lookups.parse_int_literal_string(toks[2])
     imm = BitArray(uint=imm, length=8)
     dst = lookups.REGS.index(toks[1])
@@ -61,7 +60,7 @@ class mov_hl:
 class load_store:
   def _parse_base_offset(toks):
     # ex: STORE %ax, [%sp{, #8}]
-    op = BitArray(uint=0b00100, length=5) if toks[0] == "LOAD" else BitArray(uint=0b01000, length=5)
+    op = BitArray(uint=0b00100, length=5) if toks[0] == "load" else BitArray(uint=0b01000, length=5)
     imm = 0
     if len(toks) == 4:
       # We actually have an offset
@@ -74,7 +73,7 @@ class load_store:
   
   def _parse_pre_index(toks):
     # ex: STORE %ax, [%bx, #8]!
-    op = BitArray(uint=0b00101, length=5) if toks[0] == "LOAD" else BitArray(uint=0b01001, length=5)
+    op = BitArray(uint=0b00101, length=5) if toks[0] == "load" else BitArray(uint=0b01001, length=5)
     imm = lookups.parse_int_literal_string(toks[4].strip(" ]!"))
     imm = BitArray(int=imm, length=5)
     src, trf = toks[2].strip("[ "), toks[1].strip(" ,")
@@ -84,7 +83,7 @@ class load_store:
       
   def _parse_post_index(toks):
     # ex: STORE %ax, [%bx], #8
-    op = BitArray(uint=0b00110, length=5) if toks[0] == "LOAD" else BitArray(uint=0b01010, length=5)
+    op = BitArray(uint=0b00110, length=5) if toks[0] == "load" else BitArray(uint=0b01010, length=5)
     imm = lookups.parse_int_literal_string(toks[4])
     imm = BitArray(int=imm, length=5)
     src, trf = toks[2].strip("[ ]"), toks[1].strip(" ,")
@@ -129,6 +128,40 @@ class mov:
     dst, src = BitArray(uint=dst, length=3), BitArray(uint=dst, length=3)
     return opbits + secondary_bits + hw + src + dst
   
+# All control-transfer instructions except RET (or RETI, if that gets implemented)
+# JMP, JMPR, CALL, CALLR
+class jmp_call:
+  @staticmethod
+  def _parse_indirect_jc(toks):
+    op = BitArray(uint=0b10001, length=5) if toks[0] == "jmp" else BitArray(uint=10011, length=5)
+    padding = BitArray(uint=0b00000000, length=8)
+    dst = toks[1]
+    dst = lookups.REGS.index(dst)
+    dst = BitArray(uint=dst, length=3)
+    return op + padding + dst
+
+  @staticmethod
+  def _parse_direct_jc(toks):
+    op = BitArray(uint=0b10000, length=5) if toks[0] == "jmp" else BitArray(uint=10010, length=5)
+    imm = int(toks[1])
+    imm = BitArray(int=imm, length=11)
+    return op + imm
+
+  @staticmethod
+  def parse(insn):
+    toks = insn.split(" ")
+    if toks[1].startswith("%"):
+      # indirect jump or call (through register)
+      return jmp_call._parse_indirect_jc(toks)
+    else:
+      # direct jump or call (via offset)
+      return jmp_call._parse_direct_jc(toks)
+
+# RET instruction. It's special. (not really)
+class ret:
+  @staticmethod
+  def parse(insn):
+    return BitArray(uint=0b1010000000000000, length=16)
 
 class unimplemented:
   def parse(insn):
