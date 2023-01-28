@@ -5,6 +5,7 @@ This is the official documentation for the pARMesan architecture. Contents inclu
 ## Table of Contents
 - [Overview](overview.md)
 - [Versioning](versioning.md)
+- [Proposed Features](proposals.md)
 - [Syntax](syntax.md)
 - [Architecture](arch.md)
 
