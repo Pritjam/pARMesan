@@ -6,6 +6,12 @@ pARMesan is a 16-bit CPU architecture based on AArch64 but with some x86 inspira
 
 A Rust implementation of this CPU is planned, and a little work has been done towards that project, found in it's Git repo: [bytesize](https://github.com/Pritjam/bytesize).
 
+## Usage
+First, build the project by running `make all`. This will generate the binary `parmesan` in the root directory. Now you can run the emulator on an executable via `parmesan FILENAME`. Run `parmesan -h` for a more complete list of commands.
+
+## Assembler
+The pARMesan Assembler is not yet complete, but can currently handle all Version 1 instructions except for control transfer instructions. Expect those to be implemented soon. To run it, invoke the assembler with `python3 assembler.py FILENAME.pjasm`. The output `.pj` file will be placed in the same directory as the `.pjasm` file. Optionally, you can specify a path to an output directory, such as `python3 assembler.py FILENAME.pjasm output_directory`, and the assembled `.pj` files will be placed in `output_directory`.
+
 
 ## TODO
 - List of valid instructions (not opcodes, instructions)

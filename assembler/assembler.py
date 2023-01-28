@@ -3,7 +3,8 @@ import lookups
 import os.path
 
 input_path = sys.argv[1]
-out_folder = sys.argv[2]
+
+out_folder = sys.argv[2] if len(sys.argv) >= 3 else ""
 
 def is_reg_operand(operand):
   return operand.startswith("%") and operand in lookups.REGS

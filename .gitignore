@@ -7,3 +7,5 @@ parmesan
 
 # HxD backups
 *.bak
+
+__pycache__
