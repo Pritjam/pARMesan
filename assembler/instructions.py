@@ -13,7 +13,7 @@ class alu:
     h = BitArray(uint=0, length=1) # TODO: Decide how h functionality will be used
     dst, src = toks[1], toks[2]
     dst, src = lookups.REGS.index(dst), lookups.REGS.index(src)
-    dst, src = BitArray(uint=dst, length=3), BitArray(uint=dst, length=3)
+    dst, src = BitArray(uint=dst, length=3), BitArray(uint=src, length=3)
     return opbits + alu_opbits + h + src + dst
 
   @staticmethod
@@ -36,7 +36,6 @@ class alu:
       return alu._parse_alu_rr(toks)
     else:
       return alu._parse_alu_ri(toks)
-
 
 # MOVH and MOVL instrs.
 class mov_hl:
@@ -125,7 +124,7 @@ class mov:
     hw = BitArray(uint=0, length=2) # TODO: Decide how hw functionality will be used
     dst, src = toks[1], toks[2]
     dst, src = lookups.REGS.index(dst), lookups.REGS.index(src)
-    dst, src = BitArray(uint=dst, length=3), BitArray(uint=dst, length=3)
+    dst, src = BitArray(uint=dst, length=3), BitArray(uint=src, length=3)
     return opbits + secondary_bits + hw + src + dst
   
 # All control-transfer instructions except RET (or RETI, if that gets implemented)
@@ -133,7 +132,7 @@ class mov:
 class jmp_call:
   @staticmethod
   def _parse_indirect_jc(toks):
-    op = BitArray(uint=0b10001, length=5) if toks[0] == "jmp" else BitArray(uint=10011, length=5)
+    op = BitArray(uint=0b10001, length=5) if toks[0] == "jmp" else BitArray(uint=0b10011, length=5)
     padding = BitArray(uint=0b00000000, length=8)
     dst = toks[1]
     dst = lookups.REGS.index(dst)
@@ -142,7 +141,7 @@ class jmp_call:
 
   @staticmethod
   def _parse_direct_jc(toks):
-    op = BitArray(uint=0b10000, length=5) if toks[0] == "jmp" else BitArray(uint=10010, length=5)
+    op = BitArray(uint=0b10000, length=5) if toks[0] == "jmp" else BitArray(uint=0b10010, length=5)
     imm = int(toks[1])
     imm = BitArray(int=imm, length=11)
     return op + imm
