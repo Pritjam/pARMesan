@@ -6,7 +6,7 @@
 
 #include "proc.h"
 
-#define MMIO_PRINT_ADDRESS 0xFFFF
+#define MMIO_PRINT_ADDRESS 0x6969
 
 struct proc;
 
