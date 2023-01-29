@@ -29,6 +29,17 @@ typedef enum status {
   STAT_ERR
 } status_t;
 
+typedef enum registers {
+  REG_AX,
+  REG_BX,
+  REG_CX,
+  REG_DX,
+  REG_BP,
+  REG_SI,
+  REG_DI,
+  REG_SP
+} registers_t;
+
 typedef struct proc {
   uint16_t instruction_pointer;
   uint16_t gpr_file[8];

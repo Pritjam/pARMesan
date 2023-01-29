@@ -47,16 +47,19 @@ void decode(proc_t *proc, instr_t *instr) {
   // determine ALU operation
   int h = extract_unsigned_immediate(instr->insnbits, 6, 1);
   instr->alu_op = determine_alu_op(instr->op, h);
+  // TODO: Implement hw function for mov? Is that needed?
+
 
   // extract immediate
   uint16_t imm = get_immediate(instr->insnbits, instr->op);
 
   // perform register reads
   int dst = extract_unsigned_immediate(instr->insnbits, 0, 3);
-  int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
+  int src = instr->ctrl_sigs.call ? REG_SP : extract_unsigned_immediate(instr->insnbits, 3, 3);
   uint16_t dst_val = proc->gpr_file[dst];
   uint16_t src_val = proc->gpr_file[src];
-  instr->mem_writeval = dst_val;
+  // determine what value to write to memory (IP or reg val)
+  instr->mem_writeval = instr->ctrl_sigs.call ? proc->instruction_pointer + 1 : dst_val;
 
   // determine destination registers
   instr->dst1 = dst;
@@ -68,12 +71,17 @@ void decode(proc_t *proc, instr_t *instr) {
   // if we use immediate, select it. Otherwise, go with second instruction argument value
   instr->opnd_2 = instr->ctrl_sigs.val_b_is_imm ? imm : src_val;
 
+  // if it's a call, we instead will be adding/subtracting 1 from the src_val (it's a stack operation)
+  instr->opnd_2 = instr->ctrl_sigs.call ? 1 : instr->opnd_2;
+
   // calculate branch PC
   if(instr->op == JMP || instr->op == JCC || instr->op == CALL) {
     instr->branch_pc = proc->instruction_pointer + imm;
   } else if(instr->op == JMPR || instr->op == CALLR) {
     instr->branch_pc = dst_val;
   }
+  // TODO: Implement CALL/CALLR, RET (putting IP on stack)
+
   // generate condition code
   instr->cond = extract_unsigned_immediate(instr->insnbits, 8, 3);
 
@@ -89,10 +97,9 @@ void execute(proc_t *proc, instr_t *instr) {
 }
 
 void memory(proc_t *proc, instr_t *instr) {
-  // determine what value to write to memory (IP or reg val)
-  uint16_t mem_wval = instr->op == CALL || instr->op == CALL ? proc->instruction_pointer + 1 : instr->mem_writeval;
+  uint16_t mem_wval = instr->mem_writeval;
   // make a call to memory function, or just write memory
-  uint16_t mem_address = instr->ex_val;
+  uint16_t mem_address = instr->ctrl_sigs.address_from_execute ? instr->ex_val : instr->opnd_1;
   if(mem_address == 0) {
     if(instr->ctrl_sigs.mem_read) {
       log_msg(LOG_WARN, "Null pointer read attempt");
@@ -135,7 +142,10 @@ void writeback(proc_t *proc, instr_t *instr) {
 
   // choose next IP (sequential or branch)
   if(instr->op >= JMP && instr->op <= CALLR) {
+    // JMP, JMPR, CALL, CALLR
     proc->instruction_pointer = instr->branch_pc;
+  } else if(instr->op == RET) {
+    proc->instruction_pointer = instr->mem_readval;
   } else if(instr->op == JCC && instr->cond_holds) {
     proc->instruction_pointer = instr->branch_pc;
   } else {
@@ -151,11 +161,13 @@ alu_op_t determine_alu_op(opcode_t op, int h) {
   switch(op) {
     case LOAD_BO: case LOAD_PRE: case LOAD_POST: 
     case STORE_BO: case STORE_PRE: case STORE_POST:
+    case RET:
     case ADD: case IADD:
       return ALU_PLUS;
     case ADC:
       return ALU_ADC;
     case SUB: case CMP: case ISUB: case ICMP:
+    case CALL: case CALLR:
       return ALU_MINUS;
     case SBC:
       return ALU_SBC;
@@ -229,12 +241,17 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   // bool val_a_sel; // if true, val_a comes from src, else from dst
   //                 // this is the case only in load/store instrs, as
   //                 // the ALU source is not the same as the data source/dst
-
+                     // this is also the case in CALL and RET instrs as they are
+                     // inherently stack operations.
   sigs->val_a_sel = op == LOAD_BO || op == LOAD_PRE || op == LOAD_POST ||
-                    op == STORE_BO || op == STORE_PRE || op == STORE_POST;
+                    op == STORE_BO || op == STORE_PRE || op == STORE_POST ||
+                    op == CALL || op == CALLR || op == RET;
   
   // bool val_b_is_imm; // if true, ALU second operand is immediate
-  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH && op != OUT && op != IN);
+  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH && op != OUT && op != IN) || (op >= CALL && op <= CALLR);
+
+  sigs->call = (op >= CALL && op <= CALLR) || (op == RET);
+
 
   // // consumed in Execute
   // bool set_cc;
@@ -245,6 +262,8 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->mem_read = (op >= LOAD_BO && op <= LOAD_POST) || (op == RET);
   // bool mem_write;
   sigs->mem_write = (op >= STORE_BO && op <= STORE_POST) || (op >= CALL && op <= CALLR);
+  // bool address_from_execute;
+  sigs->address_from_execute = (op == STORE_BO) || (op == STORE_PRE) || (op == LOAD_BO) || (op == LOAD_PRE) || (op >= CALL && op <= CALLR);
 
   // // consumed in Writeback
   // bool wval_1_src; // Choose where to get primary wval from

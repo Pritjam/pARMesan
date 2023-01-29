@@ -4,29 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// pub struct Instruction {
-//     // Generated in Fetch:
-//     pub insnbits: u16,
-
-//     // Generated in Decode:
-//     pub opcode: Opcodes,
-//     pub val_a: u16,
-//     pub val_b: u16,
-//     pub alu_op: super::alu::AluOp,
-//     pub mem_writeval: u16,
-//     pub dst1: usize,
-//     pub dst2: usize,
-//     pub next_pc: u16,
-//     pub control_sigs: super::ctrl_sigs::ctrl_sigs,
-
-//     // Generated in Execute:
-//     pub ex_result: u16,
-//     pub cond_holds: bool,
-
-//     // Generated in Memory:
-//     pub mem_readval: u16,
-// }
-
 typedef enum opcode {
   CHGSTAT,
   ALU_RR,
@@ -121,6 +98,7 @@ typedef struct ctrl_sigs {
                   // the ALU source is not the same as the data source/dst
   
   bool val_b_is_imm; // if true, ALU second operand is immediate
+  bool call;
 
   // consumed in Execute
   bool set_cc;
@@ -128,6 +106,7 @@ typedef struct ctrl_sigs {
   // consumed in Memory
   bool mem_read;
   bool mem_write;
+  bool address_from_execute;
 
   // consumed in Writeback
   bool wval_1_src; // Choose where to get primary wval from. If true, get from ALU. If false, get from memory output.
