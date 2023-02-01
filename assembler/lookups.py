@@ -42,7 +42,7 @@ INSTRUCTION_TO_PARSE_FN = {
   "jmp" : jmp_call, 
   "call" : jmp_call, 
   "ret" : ret, 
-  "jcc" : unimplemented, 
+  "jcc" : jmp_call, 
 }
 
 # Takes in a literal of the form "#1234" or "$89ab". 
@@ -58,6 +58,7 @@ def parse_int_literal_string(literal):
 
 
 REGS = ["%ax", "%bx", "%cx", "%dx", "%bp", "%si", "%di", "%sp"]
+CONDS = ["eq", "ne", "ge", "gt", "lt", "le", "cs", "cc"]
 
 ALU_RR_ALU_OPBITS = {
   "add": 0b0000,
@@ -97,5 +98,6 @@ CHGSTAT_INSNBITS = {
   "di": 0b100,
   "nop": 0b111
 }
+
 
 

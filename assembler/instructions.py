@@ -147,11 +147,24 @@ class jmp_call:
     return op + imm
 
   @staticmethod
+  def _parse_conditional_jump(toks):
+    op = BitArray(uint=0b10101, length=5)
+    cnd = toks[0].split('.')[1]
+    cnd = lookups.CONDS.index(cnd)
+    cnd = BitArray(uint=cnd, length=3)
+    imm = int(toks[1])
+    imm = BitArray(int=imm, length=8)
+    return op + cnd + imm
+
+  @staticmethod
   def parse(insn):
     toks = insn.split(" ")
     if toks[1].startswith("%"):
       # indirect jump or call (through register)
       return jmp_call._parse_indirect_jc(toks)
+    elif toks[0].startswith('j.'):
+      # conditional jump
+      return jmp_call._parse_conditional_jump(toks)
     else:
       # direct jump or call (via offset)
       return jmp_call._parse_direct_jc(toks)
