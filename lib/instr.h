@@ -114,7 +114,7 @@ typedef struct ctrl_sigs {
   bool w_enable_2;
 } ctrl_sigs_t;
 
-typedef enum condition_code { EQ, NE, GE, GT, LT, LE, CC, CS } condition_code_t;
+typedef enum condition_code { EQ, NE, GE, GT, LT, LE, CS, CC } condition_code_t;
 
 typedef struct instr {
   // generated in Fetch

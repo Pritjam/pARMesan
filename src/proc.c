@@ -80,7 +80,6 @@ void decode(proc_t *proc, instr_t *instr) {
   } else if(instr->op == JMPR || instr->op == CALLR) {
     instr->branch_pc = dst_val;
   }
-  // TODO: Implement CALL/CALLR, RET (putting IP on stack)
 
   // generate condition code
   instr->cond = extract_unsigned_immediate(instr->insnbits, 8, 3);
@@ -92,7 +91,7 @@ void execute(proc_t *proc, instr_t *instr) {
   run_alu(instr->opnd_1, instr->opnd_2, instr->alu_op, instr->ctrl_sigs.set_cc, &instr->ex_val, &proc->flags);
   // determine if condition holds
   // TODO: Write check_cond fn
-  // instr->cond_holds = check_cond(instr->cond, proc->flags);
+  instr->cond_holds = check_cond(instr->cond, proc->flags);
 
 }
 
@@ -277,13 +276,23 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 }
 
 void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uint16_t *ex_val, flags_t *flags) {
-  // get the actual value
+  // Run the ALU computation
   switch(alu_op) {
     case ALU_PLUS:
       *ex_val = opnd_1 + opnd_2;
       break;
     case ALU_MINUS:
-      *ex_val = opnd_1 - opnd_2;
+      // negate opnd_2 then add to opnd_1
+      opnd_2 = ~opnd_2 + 1;
+      *ex_val = opnd_1 + opnd_2;
+      break;
+    case ALU_ADC:
+      opnd_2 = opnd_2 + flags->C;
+      *ex_val = opnd_1 + opnd_2;
+      break;
+    case ALU_SBC:
+      opnd_2 = ~opnd_2 + flags->C;
+      *ex_val = opnd_1 + opnd_2;
       break;
     case ALU_AND:
       *ex_val = opnd_1 & opnd_2;
@@ -303,42 +312,64 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     case ALU_ASR:
       *ex_val = (uint16_t) (((int16_t) opnd_1) >> opnd_2);
       break;
-    case ALU_VADD_BYTE:
-      *ex_val = ((opnd_1 & 0xFF + opnd_2 & 0xFF) & 0xFF) | ((opnd_1 >> 8 & 0xFF + opnd_2 >> 8 & 0xFF) & 0xFF) << 8;
+    case ALU_VADD_BYTE: {
+      uint16_t low_byte = (opnd_1 & 0xFF + opnd_2 & 0xFF) & 0xFF;
+      uint16_t high_byte = (opnd_1 >> 8 & 0xFF + opnd_2 >> 8 & 0xFF) & 0xFF;
+      *ex_val = low_byte | (high_byte << 8);
+      // TODO: Decide if any carry or overflow flags are to be generated as a result of Vector operations.
       break;
-    case ALU_VADD_NYBL:
-      *ex_val = ((opnd_1 & 0xF + opnd_2 & 0xF) & 0xF) | ((opnd_1 >> 4 & 0xF + opnd_2 >> 4 & 0xF) & 0xF) << 4 | ((opnd_1 >> 8 & 0xF + opnd_2 >> 8 & 0xF) & 0xF) << 8 | ((opnd_1 >> 12 & 0xF + opnd_2 >> 12 & 0xF) & 0xF) << 12;
+    }
+    case ALU_VSUB_BYTE: {
+      uint16_t low_byte = (opnd_1 & 0xFF - opnd_2 & 0xFF) & 0xFF;
+      uint16_t high_byte = (opnd_1 >> 8 & 0xFF - opnd_2 >> 8 & 0xFF) & 0xFF;
+      *ex_val = low_byte | (high_byte << 8);
       break;
-    case ALU_VSUB_BYTE:
-      *ex_val = ((opnd_1 & 0xFF - opnd_2 & 0xFF) & 0xFF) | ((opnd_1 >> 8 & 0xFF - opnd_2 >> 8 & 0xFF) & 0xFF) << 8;
+    }
+
+      // TODO: Decide if we're keeping the VLSL and VLSR's, or if we should change them.
+    case ALU_VLSL_BYTE: {
+      uint16_t low_byte = ((opnd_1 & 0xFF) << (opnd_2 & 0xFF)) & 0xFF;
+      uint16_t high_byte = ((opnd_1 >> 8 & 0xFF) << (opnd_2 >> 8 & 0xFF)) & 0xFF;
+      *ex_val = low_byte | (high_byte << 8);
       break;
-    case ALU_VSUB_NYBL:
-      *ex_val = ((opnd_1 & 0xF - opnd_2 & 0xF) & 0xF) | ((opnd_1 >> 4 & 0xF - opnd_2 >> 4 & 0xF) & 0xF) << 4 | ((opnd_1 >> 8 & 0xF - opnd_2 >> 8 & 0xF) & 0xF) << 8 | ((opnd_1 >> 12 & 0xF - opnd_2 >> 12 & 0xF) & 0xF) << 12;
+    }
+    case ALU_VLSR_BYTE: {
+      uint16_t low_byte = ((opnd_1 & 0xFF) >> (opnd_2 & 0xFF)) & 0xFF;
+      uint16_t high_byte = ((opnd_1 >> 8 & 0xFF) >> (opnd_2 >> 8 & 0xFF)) & 0xFF;
+      *ex_val = low_byte | (high_byte << 8);
       break;
-    // case ALU_VLSL_BYTE:
-    //   *ex_val = (((opnd_1 & 0xFF) << (opnd_2 & 0xFF)) & 0xFF) | (((opnd_1 >> 8 & 0xFF) << (opnd_2 >> 8 & 0xFF)) & 0xFF) << 8;
-    //   break;
+    }
+    
+    case ALU_VADD_NYBL: {
+      uint16_t low_nybble = (opnd_1 & 0xF + opnd_2 & 0xF) & 0xF;
+      uint16_t med_low_nybble = (opnd_1 >> 4 & 0xF + opnd_2 >> 4 & 0xF) & 0xF;
+      uint16_t med_high_nybble = (opnd_1 >> 8 & 0xF + opnd_2 >> 8 & 0xF) & 0xF;
+      uint16_t high_nybble = (opnd_1 >> 12 & 0xF + opnd_2 >> 12 & 0xF) & 0xF;
+      *ex_val = low_nybble | (med_low_nybble << 4) | (med_high_nybble << 4) | (high_nybble << 12);
+      break;
+    }
+    case ALU_VSUB_NYBL: {
+      uint16_t low_nybble = (opnd_1 & 0xF - opnd_2 & 0xF) & 0xF;
+      uint16_t med_low_nybble = (opnd_1 >> 4 & 0xF - opnd_2 >> 4 & 0xF) & 0xF;
+      uint16_t med_high_nybble = (opnd_1 >> 8 & 0xF - opnd_2 >> 8 & 0xF) & 0xF;
+      uint16_t high_nybble = (opnd_1 >> 12 & 0xF - opnd_2 >> 12 & 0xF) & 0xF;
+      *ex_val = low_nybble | (med_low_nybble << 4) | (med_high_nybble << 4) | (high_nybble << 12);
+      break;
+    }
+   
     // case ALU_VLSL_NYBL:
-    // case ALU_VLSR_BYTE:
-    //   *ex_val = (((opnd_1 & 0xFF) >> (opnd_2 & 0xFF)) & 0xFF) | (((opnd_1 >> 8 & 0xFF) >> (opnd_2 >> 8 & 0xFF)) & 0xFF) << 8;
-    //   break;
     // case ALU_VLSR_NYBL:
     case ALU_MOVL:
-      opnd_1 &= 0xFF00;
-      *ex_val = opnd_1 | opnd_2 & 0x00FF;
+      opnd_1 &= 0xFF00; // clear out low byte
+      *ex_val = opnd_1 | opnd_2 & 0x00FF; // apply low byte
       break;
     case ALU_MOVH:
-      opnd_1 &= 0x00FF;
-      *ex_val = opnd_1 | opnd_2 << 8;
+      opnd_1 &= 0x00FF; // clear out high byte
+      *ex_val = opnd_1 | opnd_2 << 8; // apply high byte
       break;
-    case ALU_PASS_B:
+    case ALU_PASS_B: // just pass opnd_2 through. Used only in MOV.
       *ex_val = opnd_2;
       break;
-    case ALU_ADC:
-      *ex_val = opnd_1 + opnd_2 + flags->C;
-      break;
-    case ALU_SBC:
-      *ex_val = opnd_1 - (opnd_2 + flags->C);
     case ALU_NONE:
       break;
   }
@@ -346,14 +377,24 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     return;
   }
 
-  // if we need to set flags:
+  // Set zero and negative flags:
   // technically we could skip the explicit equal signs, but I kept them for readability
   flags->Z = *ex_val == 0;
   flags->N = (*ex_val >> 15) == 1;
+
+  // Clear out these two flags to start
   flags->C = false;
   flags->V = false;
 
-  if(alu_op == ALU_PLUS) {
+  if(alu_op == ALU_PLUS || alu_op == ALU_MINUS || alu_op == ALU_ADC || alu_op == ALU_SBC) {
+    // https://en.wikipedia.org/wiki/Carry_flag#Vs._borrow_flag
+    // This architecture uses the "second form" of the carry flag, as listed in this paragraph from the above linked article:
+    // The second uses the identity that −x = (not x)+1 directly (i.e. without storing the carry bit inverted) 
+    // and computes a-b as a+(not b)+1. The carry flag is set according to this addition, and subtract with carry
+    // computes a+not(b)+C, while subtract without carry acts as if the carry bit were set. The result is that the 
+    // carry bit is set if a≥b, and clear if a<b.
+
+    // TODO: This is still probably incorrect, gotta hit the books on this one.
     flags->C = *ex_val < opnd_1 && *ex_val < opnd_2;
     // overflow: if A and B are negative (MSB is set) and C is positive,
     // or if A and B are positive (MSB clear) and C is negative
@@ -362,13 +403,30 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     bool C = (*ex_val >> 15) == 1;
     flags->V = (A && B && !C) || (!A && !B && C);
   }
+}
 
-  if(alu_op == ALU_MINUS) {
-    // inverse of ALU carry?
-    // flags->C = 
-    // overflow: 
-    // TODO: Get the right rules for this.
+bool check_cond(condition_code_t cnd, flags_t flags) {
+  // GT	Signed Greater Than	(Z==0) && (N==V)
+// LT	Signed Less Than	N!=V
+// GE	Signed Greater Than or Equal	N==V
+// LE	Signed Less Than or Equal	(Z==1) || (N!=V)
+  switch(cnd) {
+    case EQ:
+      return flags.Z;
+    case NE:
+      return !flags.Z;
+    case GE:
+      return flags.N == flags.V;
+    case GT:
+      return !flags.Z && flags.N == flags.V;
+    case LT:
+      return flags.N != flags.V;
+    case LE:
+      return flags.Z || flags.N != flags.V;
+    case CS:
+      return flags.C;
+    case CC:
+      return !flags.C;
   }
-
 }
 

@@ -5,6 +5,8 @@ parmesan
 *.pj
 *.pjasm
 
+tests/
+
 # HxD backups
 *.bak
 
