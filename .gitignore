@@ -1,11 +1,9 @@
 parmesan
 .vscode/
 
-# assembly and binary files
-*.pj
-*.pjasm
 
-tests/
+tests/asm
+tests/Makefile
 
 # HxD backups
 *.bak
