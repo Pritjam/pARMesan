@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   free(filename);
   log_msg(LOG_INFO, "Loading binary file now");
   if (assembly_file == NULL) {
-    log_msg(LOG_FATAL, "Error while attempting to open assembly file. Check name.");
+    log_msg(LOG_FATAL, "Error while attempting to open assembly file. Check name or path.");
   }
 
   // Having opened the file, now we need to initialize system
@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
   // any other system init tasks go here
   instr_t instr;
   load_binary(mem, assembly_file);
+  // load memdump file if applicable
   
   // main CPU loop goes here
   while(proc.status != STAT_HALT) {
@@ -86,5 +87,7 @@ int main(int argc, char *argv[]) {
 
   // closing remarks go here
   free(mem);
+
+  log_msg(LOG_INFO, "Run completed. Closing now.");
 
 }

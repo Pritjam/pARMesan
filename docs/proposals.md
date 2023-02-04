@@ -10,7 +10,6 @@ Instructions that can do floating-point math. This would likely also involve des
 ### Extended Register Operations
 Instructions that make use of register pairs, like the 8080's `BC`, `DE`, and `HL` register pairs. This would allow for 32-bit computing, extended integer precision, or larger SIMD operations.
 
-
 ### Memory Segmentation
 Rework the memory architecture to use segmentation, as introduced with the 8086, to expand addressable range. There's probably better ways of going about this than the 8086 did, since that implementation allowed multiple segment + address pairs to map to the same physical address.
 
