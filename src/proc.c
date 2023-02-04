@@ -269,7 +269,7 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->wval_1_src = (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR);
 
   // bool w_enable_1;
-  sigs->w_enable_1 = (op >= LOAD_BO && op <= IN) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR);
+  sigs->w_enable_1 = (op >= LOAD_BO && op <= IN) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST);
   // bool w_enable_2;
   sigs->w_enable_2 = op == LOAD_PRE || op == LOAD_POST || op == STORE_PRE || op == STORE_POST ||
                       op == CALL || op == CALLR || op == RET;
