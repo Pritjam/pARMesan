@@ -18,4 +18,4 @@ First, build the project by running `make all`. This will generate the binary `p
 - Standardize operand format in line with A64 following 1.0 revision
 - Remove Versioning section or move it to a separate doc
 - Set up Project page on personal site
-- Memdump format, working title "cheesewheel"?
+- Memdump format, working title "FETA"?

@@ -21,7 +21,7 @@ Memory operands are specified as `[mem]`. There are 3 forms this memory operand 
   - Post-Indexed: `[<Rs>], #imm`
 
 ### Labels
-Labels (jump targets) are denoted by .LABEL. 
+Labels (jump targets) are denoted by an identifier starting with a period, such as `.END`, `.loop1`, or `.branch4`.
 
 ---
 
