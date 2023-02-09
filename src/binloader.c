@@ -12,7 +12,6 @@ void load_binary(uint16_t *emulated_mem, FILE *file) {
   // for now, a basic test that the file length is a mult of 2 Bytes
   if(size % 2 == 1) {
     log_msg(LOG_FATAL, "File does not meet correct standards!");
-    exit(-1);
   }
 
   // read the file in
@@ -36,20 +35,19 @@ void load_binary(uint16_t *emulated_mem, FILE *file) {
 }
 
 
-void load_data_seg(uint16_t *emulated_mem, FILE *file) {
-  memdump_header_t header;
+void load_memory_image(uint16_t *emulated_mem, FILE *file) {
+  feta_header_t header;
   // read in header
-  fread(&header, sizeof(memdump_header_t), 1, file);
+  fread(&header, sizeof(feta_header_t), 1, file);
 
   // check magic identifier
-  if(!strncmp(header.magic_identifier, "parm", 4)) {
+  if(strncmp(header.magic_identifier, "feta", 4) != 0) {
     char temp[5];
     strncpy(temp, header.magic_identifier, 4);
     temp[4] = 0;
     char msg[80];
-    sprintf(msg, "Bad file header for memdump file! Found %s, expected `Pmem`.", temp);
+    sprintf(msg, "Bad file header for memdump file! Found %s, expected `feta`.", temp);
     log_msg(LOG_FATAL, msg);
-    exit(EXIT_FAILURE);
   }
 
   // check version number
@@ -57,7 +55,6 @@ void load_data_seg(uint16_t *emulated_mem, FILE *file) {
     char msg[70];
     sprintf(msg, "Bad file version for memdump file! Found %d, expected %d.", header.version, PARM_VERSION);
     log_msg(LOG_FATAL, msg);
-    exit(EXIT_FAILURE);
   }
 
   // If both version number and magic identifier worked out:

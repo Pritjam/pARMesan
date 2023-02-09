@@ -19,12 +19,12 @@ typedef struct parmesan_rind {
 // Takes in a file pointer for a pARMesan binary file and loads it into memory starting at offset 0.
 extern void load_binary(uint16_t *emulated_mem, FILE *file);
 
-typedef struct memdump_header {
-  char magic_identifier[4]; // should be "Pmem"
+typedef struct feta_header {
+  char magic_identifier[4]; // should be "feta"
   uint8_t version; 
   uint8_t num_of_segments; // how many segments are in this file
   uint16_t reserved; // currently unused; might become a checksum or something else.
-} memdump_header_t;
+} feta_header_t;
 
 typedef struct memseg_header {
   uint16_t start_address;
@@ -34,6 +34,6 @@ typedef struct memseg_header {
 
 // Takes in a file pointer for a pARMesan memory dump file and reads it into memory.
 // Offset and size information is contained within the pARMesan memory dump file header.
-extern void load_data_seg(uint16_t *emulated_mem, FILE *file);
+extern void load_memory_image(uint16_t *emulated_mem, FILE *file);
 
 #endif

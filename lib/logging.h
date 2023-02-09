@@ -16,6 +16,6 @@ typedef enum {
   LOG_OTHER = -1 // should not be used
 } log_level;
 
-extern int log_msg(log_level lvl, char *msg);
+extern void log_msg(log_level lvl, char *msg);
 
 #endif

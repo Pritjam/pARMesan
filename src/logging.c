@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #include "ansicolors.h"
 
@@ -30,11 +32,12 @@ static char *format_log_message(log_level severity, char *message) {
   return printbuf;
 }
 
-int log_msg(log_level severity, char *message) {
+void log_msg(log_level severity, char *message) {
   if(severity < global_verbosity) {
-    return 0;
+    return;
   }
   FILE *out;
+  bool do_exit = false;
   switch (severity) {
     case LOG_DEBUG:
     case LOG_INFO:
@@ -42,6 +45,7 @@ int log_msg(log_level severity, char *message) {
       out = stdout;
       break;
     case LOG_FATAL:
+      do_exit = true;
       out = stderr;
       break;
     case LOG_OUTPUT:
@@ -50,5 +54,9 @@ int log_msg(log_level severity, char *message) {
     case LOG_OTHER:
       break;
   }
-  return fprintf(out, "%s\n", format_log_message(severity, message));
+  fprintf(out, "%s\n", format_log_message(severity, message));
+  if(do_exit) {
+    exit(EXIT_FAILURE);
+  }
+  return;
 }

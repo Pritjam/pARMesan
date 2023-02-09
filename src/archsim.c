@@ -14,33 +14,37 @@ int global_verbosity = LOG_INFO; // by default, messages of INFO severity and hi
 
 int main(int argc, char *argv[]) {
   int opt;
-  char *filename = NULL;
+  char *executable_filename = NULL;
+  char *memdump_filename = NULL;
   // printf("Hello");
 
-  while ((opt = getopt(argc, argv, "v:f:h")) != -1) {
+  while ((opt = getopt(argc, argv, "v:m:h")) != -1) {
     switch (opt) {
       case 'v':
         global_verbosity = *optarg - '0';
+        global_verbosity = VERBOSITY_MAX - global_verbosity;
         if (global_verbosity < 0 || global_verbosity > VERBOSITY_MAX) {
           printf("Verbosity must be at least 0 and at most %d\n", VERBOSITY_MAX);
           exit(-1);
         }
         break;
+      
+      case 'm':
+        memdump_filename = (char *)malloc(strlen(optarg) + 1);
+        strcpy(memdump_filename, optarg);
+        break;
 
       case 'h':
-        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] FILENAME\n", argv[0],
+      default:
+        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] [-m MEMDUMP_FILENAME] EXECUTABLE_FILENAME\n", argv[0],
                argv[0]);
         exit(0);
-      default:
-        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] FILENAME\n", argv[0],
-               argv[0]);
-        exit(-1);
     }
   }
 
   if (optind == argc - 1) {
-    filename = (char *)malloc(strlen(argv[optind]) + 1);
-    strcpy(filename, argv[optind]);
+    executable_filename = (char *)malloc(strlen(argv[optind]) + 1);
+    strcpy(executable_filename, argv[optind]);
   } else {
     printf(
         "Must provide exactly one filename at the end of the arguments to run "
@@ -48,13 +52,25 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
 
-  // now that args are handled, we need to load the file
-  FILE *assembly_file = fopen(filename, "r");
-  free(filename);
-  log_msg(LOG_INFO, "Loading binary file now");
+  // now that args are handled, we need to open the executable file
+  log_msg(LOG_INFO, "Opening binary file now");
+  FILE *assembly_file = fopen(executable_filename, "r");
+  free(executable_filename);
   if (assembly_file == NULL) {
     log_msg(LOG_FATAL, "Error while attempting to open assembly file. Check name or path.");
   }
+
+  FILE *memdump_file = NULL;
+  // Next, we need to open the memory image file, if applicable
+  if(memdump_filename != NULL) {
+    log_msg(LOG_INFO, "Opening memory image file now");
+    memdump_file = fopen(memdump_filename, "r");
+    free(memdump_filename);
+    if(memdump_file == NULL) {
+      log_msg(LOG_WARN, "Error while attempting to open memory image file. Check name or path.");
+    }
+  }
+
 
   // Having opened the file, now we need to initialize system
   system_bus_t sys = init_system();
@@ -75,6 +91,11 @@ int main(int argc, char *argv[]) {
   instr_t instr;
   load_binary(mem, assembly_file);
   // load memdump file if applicable
+  if(memdump_file) {
+    load_memory_image(mem, memdump_file);
+  }
+
+
   
   // main CPU loop goes here
   while(proc.status != STAT_HALT) {

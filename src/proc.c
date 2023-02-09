@@ -27,6 +27,13 @@ void decode(proc_t *proc, instr_t *instr) {
   uint16_t top_level_op_bits = extract_unsigned_immediate(instr->insnbits, 11, 5);
   instr->op = TOPLEVEL_LOOKUP[top_level_op_bits];
 
+  if(instr->op == ERR) {
+    proc->status = STAT_ERR;
+    char msg[50];
+    sprintf(msg, "Undefined opcode 0x%x", top_level_op_bits);
+    log_msg(LOG_FATAL, msg);
+  }
+
   // resolve actual opcode for those that require it
   if(instr->op == CHGSTAT) {
     uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 8, 3);
