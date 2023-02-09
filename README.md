@@ -6,7 +6,7 @@ pARMesan is a 16-bit CPU architecture based on AArch64 but with some x86 inspira
 
 A Rust implementation of this CPU is planned, and a little work has been done towards that project, found in it's Git repo: [bytesize](https://github.com/Pritjam/bytesize).
 
-An assembler for this ISA is available, called [cheesegrater](https://github.com/Pritjam/cheesegrater). It is still in the early stages of development, and does not yet have good documentation. 
+An assembler for this ISA is available, called [cheesegrater](https://github.com/Pritjam/cheesegrater). It is still in the early stages of development, and does not yet have good documentation. It is currently able to assemble some simple programs, which can be found in that repository.
 
 ## Usage
 First, build the project by running `make all`. This will generate the binary `parmesan` in the root directory. Now you can run the emulator on an executable via `parmesan FILENAME`. Run `parmesan -h` for a more complete list of commands.
