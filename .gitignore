@@ -1,6 +1,6 @@
 parmesan
 .vscode/
-
+.clangd
 
 tests/asm
 tests/Makefile
