@@ -11,11 +11,9 @@ typedef enum opcode {
   LOAD_BO,
   LOAD_PRE,
   LOAD_POST,
-  IN,
   STORE_BO,
   STORE_PRE,
   STORE_POST,
-  OUT,
   MOVL,
   MOVH,
   MOV,
@@ -143,8 +141,8 @@ typedef struct instr {
 } instr_t;
 
 static opcode_t TOPLEVEL_LOOKUP[32] = {
-    CHGSTAT,  ALU_RR,    ALU_RI,     ERR,   LOAD_BO, LOAD_PRE, LOAD_POST, IN,
-    STORE_BO, STORE_PRE, STORE_POST, OUT,   MOVL,    MOVH,     MOV,       INT,
+    CHGSTAT,  ALU_RR,    ALU_RI,     ERR,   LOAD_BO, LOAD_PRE, LOAD_POST, ERR,
+    STORE_BO, STORE_PRE, STORE_POST, ERR,   MOVL,    MOVH,     MOV,       INT,
     JMP,      JMPR,      CALL,       CALLR, RET,     JCC,      ERR,       ERR,
     ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
 

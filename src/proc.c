@@ -1,5 +1,6 @@
 #include "proc.h"
 #include "bits.h"
+#include "instr.h"
 
 proc_t init_proc() {
   proc_t ret;
@@ -219,10 +220,6 @@ uint16_t get_immediate(uint16_t insnbits, opcode_t op) {
     return extract_signed_immediate(insnbits, 6, 5);
   }
 
-  if(op == IN || op == OUT) {
-    return extract_unsigned_immediate(insnbits, 3, 8);
-  }
-
   if(op == MOVH || op == MOVL) {
     return extract_unsigned_immediate(insnbits, 3, 8);
   }
@@ -254,7 +251,7 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
                     op == CALL || op == CALLR || op == RET;
   
   // bool val_b_is_imm; // if true, ALU second operand is immediate
-  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH && op != OUT && op != IN) || (op >= CALL && op <= CALLR);
+  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH) || (op >= CALL && op <= CALLR);
 
   sigs->call = (op >= CALL && op <= CALLR) || (op == RET);
 
@@ -276,7 +273,7 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->wval_1_src = (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR);
 
   // bool w_enable_1;
-  sigs->w_enable_1 = (op >= LOAD_BO && op <= IN) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST);
+  sigs->w_enable_1 = (op >= LOAD_BO && op <= LOAD_POST) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST);
   // bool w_enable_2;
   sigs->w_enable_2 = op == LOAD_PRE || op == LOAD_POST || op == STORE_PRE || op == STORE_POST ||
                       op == CALL || op == CALLR || op == RET;
