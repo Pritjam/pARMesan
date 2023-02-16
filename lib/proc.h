@@ -8,7 +8,6 @@
 
 #include "system.h"
 #include "instr.h"
-#include "logging.h"
 
 #define INITIAL_IP 0
 
@@ -57,11 +56,5 @@ void decode(proc_t *, instr_t *);
 void execute(proc_t *, instr_t *);
 void memory(proc_t *, instr_t *);
 void writeback(proc_t *, instr_t *);
-
-alu_op_t determine_alu_op(opcode_t, int);
-uint16_t get_immediate(uint16_t, opcode_t);
-void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op);
-void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uint16_t *ex_val, flags_t *flags);
-bool check_cond(condition_code_t cnd, flags_t flags);
 
 #endif
