@@ -13,7 +13,7 @@ When a procedure is called, the CALL instruction automatically saves the Return 
 When it is time to return from a procedure, the value in `%bp` is moved into `%sp`. This closes down the space previously allocated for the Stack Frame and leaves `%sp` pointing to the Frame Record. `%bp` can now be popped from the stack, which causes `%bp` to point to the Frame Record of the hierarchically previous procedure call. This sequence of instructions is called the epilogue. Finally, the RET instruction can occur, which pops the Return Address from the stack and continues execution.
 
 ## Example Procedure Call
-```nasm
+```asm
 .MAIN:
 ; initialize parameters
   MOVL %ax, #10
