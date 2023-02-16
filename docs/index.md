@@ -8,7 +8,8 @@ This is the official documentation for the pARMesan architecture. Contents inclu
 - [Proposed Features](proposals.md)
 - [Syntax](syntax.md)
 - [Architecture](arch.md)
-- [Instructions](instructions/index.md)
+- [Instructions](instructions.md)
+- [Procedure Call Standard](pcs.md)
 
 ---
 

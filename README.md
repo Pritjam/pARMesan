@@ -17,3 +17,4 @@ First, build the project by running `make all`. This will generate the binary `p
 - Write an instruction page template
 - Set up Project page on personal site
 - Add current version banner
+- Correctly implement `h` vs extended immediate functionality for immediate ALU ops. Perhaps an `extract_imm_advanced` func?
