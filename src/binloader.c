@@ -1,17 +1,18 @@
 #include "binloader.h"
 
 #include "logging.h"
+#include <assert.h>
+#include <stdio.h>
 #include <string.h>
 
 void load_binary(uint16_t *emulated_mem, FILE *file) {
-  fseek(file, 0, SEEK_END); // seek to end of file
-  long size = ftell(file); // get current file pointer
-  fseek(file, 0, SEEK_SET); // seek back to beginning of file
-
-  // TODO: Implement asm file standards, checksum? header?
-  // for now, a basic test that the file length is a mult of 2 Bytes
-  if(size % 2 == 1) {
-    log_msg(LOG_FATAL, "File does not meet correct standards!");
+  parmesan_rind_t header;
+  // read in header
+  fread(&header, sizeof(parmesan_rind_t), 1, file);
+  if(header.version != PARM_VERSION) {
+    char buf[55];
+    sprintf(buf, "Incorrect pARMesan version. Found %d, expected %d", header.version, PARM_VERSION);
+    log_msg(LOG_FATAL, buf);
   }
 
   // read the file in
@@ -23,9 +24,9 @@ void load_binary(uint16_t *emulated_mem, FILE *file) {
   // fread(emulated_mem, sizeof(uint16_t), size / sizeof(uint16_t), file);
 
   // Hacky workaround: Read it as an array of bytes, then manually make uint16s. This is not a good way to do this.
-  fread(emulated_mem, sizeof(uint8_t), size / sizeof(uint8_t), file);
+  fread(emulated_mem, sizeof(uint8_t), header.length / sizeof(uint8_t), file);
   uint8_t *mem_byte_ptr = (uint8_t *) emulated_mem;
-  for(long i = 0; i < size; i += 2) {
+  for(long i = 0; i < header.length; i += 2) {
     uint8_t high_byte = mem_byte_ptr[i];
     uint8_t low_byte = mem_byte_ptr[i + 1];
     uint16_t instr_word = ((uint16_t) high_byte) << 8;
@@ -51,7 +52,7 @@ void load_memory_image(uint16_t *emulated_mem, FILE *file) {
   }
 
   // check version number
-  if(header.version != PARM_VERSION) {
+  if(header.version != MEMDUMP_VERSION) {
     char msg[70];
     sprintf(msg, "Bad file version for memdump file! Found %d, expected %d.", header.version, PARM_VERSION);
     log_msg(LOG_FATAL, msg);

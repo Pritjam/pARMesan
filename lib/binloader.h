@@ -5,15 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PARM_VERSION 1
+#define PARM_VERSION 2
+#define MEMDUMP_VERSION 1
 
 // The header for a pARMesan binary file.
 // This is kind of like an ELF file, in that it's
 // executable instructions in a file.
 typedef struct parmesan_rind {
   char magic_identifier[4]; // should be "parm"
+  uint16_t length;
   uint8_t version; 
-  uint8_t reserved[3]; // for future use
+  uint8_t reserved; // for future use
 } parmesan_rind_t;
 
 // Takes in a file pointer for a pARMesan binary file and loads it into memory starting at offset 0.
