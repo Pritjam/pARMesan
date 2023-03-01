@@ -13,6 +13,8 @@ proc_t init_proc() {
   for(int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
+  // initialize SP to this funky value
+  ret.gpr_file[REG_SP] = 0xFFFF; // TODO: Design where stack will actually be
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
   return ret;
@@ -64,12 +66,12 @@ void decode(proc_t *proc, instr_t *instr) {
   uint16_t imm = get_immediate(instr->insnbits, instr->op);
 
   // perform register reads
-  int dst = extract_unsigned_immediate(instr->insnbits, 0, 3);
-  int src = instr->ctrl_sigs.call ? REG_SP : extract_unsigned_immediate(instr->insnbits, 3, 3);
-  uint16_t dst_val = proc->gpr_file[dst];
+  int dst = instr->ctrl_sigs.call ? REG_LR : extract_unsigned_immediate(instr->insnbits, 0, 3);
+  int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
+  uint16_t dst_trf_val = proc->gpr_file[dst];
   uint16_t src_val = proc->gpr_file[src];
-  // determine what value to write to memory (IP or reg val)
-  instr->mem_writeval = instr->ctrl_sigs.call ? proc->instruction_pointer + 1 : dst_val;
+  // we will write the value of the trf register to memory
+  instr->mem_writeval = dst_trf_val;
 
   // determine destination registers
   instr->dst1 = dst;
@@ -77,18 +79,19 @@ void decode(proc_t *proc, instr_t *instr) {
 
   // generate ALU operands
   // if it's a memory index operation, first ALU operand is from the src reg, not the trf reg
-  instr->opnd_1 = instr->ctrl_sigs.val_a_sel ? src_val : dst_val;
+  instr->opnd_1 = instr->ctrl_sigs.val_a_sel ? src_val : dst_trf_val;
   // if we use immediate, select it. Otherwise, go with second instruction argument value
   instr->opnd_2 = instr->ctrl_sigs.val_b_is_imm ? imm : src_val;
 
-  // if it's a call, we instead will be adding/subtracting 1 from the src_val (it's a stack operation)
-  instr->opnd_2 = instr->ctrl_sigs.call ? 1 : instr->opnd_2;
+  // if this is a call, we need to instead pass the Return Address as opnd1.
+  instr->opnd_1 = instr->ctrl_sigs.call ? proc->instruction_pointer + 1 : instr->opnd_1;
 
   // calculate branch PC
   if(instr->op == JMP || instr->op == JCC || instr->op == CALL) {
     instr->branch_pc = proc->instruction_pointer + imm;
-  } else if(instr->op == JMPR || instr->op == CALLR) {
-    instr->branch_pc = dst_val;
+  } else if(instr->op == JMPR || instr->op == CALLR || instr->op == RET) {
+    // after all, a RET is the same as `JMPR %lr`
+    instr->branch_pc = dst_trf_val;
   }
 
   // generate condition code
@@ -155,7 +158,7 @@ void writeback(proc_t *proc, instr_t *instr) {
     // JMP, JMPR, CALL, CALLR
     proc->instruction_pointer = instr->branch_pc;
   } else if(instr->op == RET) {
-    proc->instruction_pointer = instr->mem_readval;
+    proc->instruction_pointer = instr->branch_pc;
   } else if(instr->op == JCC && instr->cond_holds) {
     proc->instruction_pointer = instr->branch_pc;
   } else {

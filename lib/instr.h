@@ -8,22 +8,23 @@ typedef enum opcode {
   CHGSTAT,
   ALU_RR,
   ALU_RI,
+  FVOP,
   LOAD_BO,
   LOAD_PRE,
   LOAD_POST,
+  MOVL,
   STORE_BO,
   STORE_PRE,
   STORE_POST,
-  MOVL,
   MOVH,
   MOV,
+  RET,
+  JCC,
   INT,
   JMP,
   JMPR,
   CALL,
   CALLR,
-  RET,
-  JCC,
   HLT,
   EXX,
   EXF,
@@ -42,10 +43,8 @@ typedef enum opcode {
   SBC,
   TEST,
   ASR,
-  VADD,
-  VSUB,
-  VLSL,
-  VLSR,
+  MUL,
+  DIV,
   IADD,
   ISUB,
   IAND,
@@ -66,19 +65,14 @@ typedef enum alu_op {
   ALU_LSL,
   ALU_LSR,
   ALU_ASR,
-  ALU_VADD_BYTE,
-  ALU_VADD_NYBL,
-  ALU_VSUB_BYTE,
-  ALU_VSUB_NYBL,
-  ALU_VLSL_BYTE,
-  ALU_VLSL_NYBL,
-  ALU_VLSR_BYTE,
-  ALU_VLSR_NYBL,
+  ALU_MUL,
+  ALU_DIV,
   ALU_ADC,
   ALU_SBC,
   ALU_MOVL,
   ALU_MOVH,
   ALU_PASS_B,
+  ALU_PASS_A,
   ALU_NONE,
   ALU_ERR = -1
 } alu_op_t;
@@ -141,16 +135,16 @@ typedef struct instr {
 } instr_t;
 
 static opcode_t TOPLEVEL_LOOKUP[32] = {
-    CHGSTAT,  ALU_RR,    ALU_RI,     ERR,   LOAD_BO, LOAD_PRE, LOAD_POST, ERR,
-    STORE_BO, STORE_PRE, STORE_POST, ERR,   MOVL,    MOVH,     MOV,       INT,
-    JMP,      JMPR,      CALL,       CALLR, RET,     JCC,      ERR,       ERR,
+    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD_BO, LOAD_PRE, LOAD_POST, MOVL,
+    STORE_BO, STORE_PRE, STORE_POST, MOVH,   RET,    JCC,     MOV,       INT,
+    JMP,      JMPR,      CALL,       CALLR, ERR,     ERR,      ERR,       ERR,
     ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
 
 static opcode_t CHGSTAT_LOOKUP[8] = {HLT, EXX, EXF, EI, DI, ERR, ERR, NOP};
 
 static opcode_t ALU_RR_LOOKUP[16] = {
   ADD,  SUB,  AND,   OR,   XOR,   CMP,   LSL,   LSR,  
-  ADC,  SBC,  TEST,  ASR,  VADD,  VSUB,  VLSL,  VLSR};
+  ADC,  SBC,  TEST,  ASR,  MUL,  DIV,  ERR,  ERR};
 
 static opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR,
                                     IXOR, ICMP, ILSL, ILSR};

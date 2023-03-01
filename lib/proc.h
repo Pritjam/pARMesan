@@ -33,10 +33,10 @@ typedef enum registers {
   REG_BX,
   REG_CX,
   REG_DX,
+  REG_IX,
   REG_BP,
-  REG_SI,
-  REG_DI,
-  REG_SP
+  REG_SP,
+  REG_LR
 } registers_t;
 
 typedef struct proc {

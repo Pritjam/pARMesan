@@ -1,18 +1,17 @@
 #include "hw_elts.h"
 #include "bits.h"
+#include "instr.h"
 #include "logging.h"
 
 alu_op_t determine_alu_op(opcode_t op, int h) {
   switch(op) {
     case LOAD_BO: case LOAD_PRE: case LOAD_POST: 
     case STORE_BO: case STORE_PRE: case STORE_POST:
-    case RET:
     case ADD: case IADD:
       return ALU_PLUS;
     case ADC:
       return ALU_ADC;
     case SUB: case CMP: case ISUB: case ICMP:
-    case CALL: case CALLR:
       return ALU_MINUS;
     case SBC:
       return ALU_SBC;
@@ -28,14 +27,6 @@ alu_op_t determine_alu_op(opcode_t op, int h) {
       return ALU_LSR;
     case ASR:
       return ALU_ASR;
-    case VADD:
-      return h ? ALU_VADD_NYBL : ALU_VADD_BYTE;
-    case VSUB:
-      return h ? ALU_VSUB_NYBL : ALU_VSUB_BYTE;
-    case VLSL:
-      return h ? ALU_VLSL_NYBL : ALU_VLSL_BYTE;
-    case VLSR:
-      return h ? ALU_VLSR_NYBL : ALU_VLSL_BYTE;
     case MOVL:
       return ALU_MOVL;
     case MOVH:
@@ -44,6 +35,8 @@ alu_op_t determine_alu_op(opcode_t op, int h) {
       return ALU_ERR;
     case MOV:
       return ALU_PASS_B;
+    case CALL: case CALLR:
+      return ALU_PASS_A;
     default:
       return ALU_NONE;
   }
@@ -81,17 +74,14 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   // // consumed in Decode
   // bool val_a_sel; // if true, val_a comes from src, else from dst
   //                 // this is the case only in load/store instrs, as
-  //                 // the ALU source is not the same as the data source/dst
-                     // this is also the case in CALL and RET instrs as they are
-                     // inherently stack operations.
+  //                 // the ALU source is not the same as the data source/dst.
   sigs->val_a_sel = op == LOAD_BO || op == LOAD_PRE || op == LOAD_POST ||
-                    op == STORE_BO || op == STORE_PRE || op == STORE_POST ||
-                    op == CALL || op == CALLR || op == RET;
+                    op == STORE_BO || op == STORE_PRE || op == STORE_POST;
   
   // bool val_b_is_imm; // if true, ALU second operand is immediate
-  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH) || (op >= CALL && op <= CALLR);
+  sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || (op >= LOAD_BO && op <= MOVH);
 
-  sigs->call = (op >= CALL && op <= CALLR) || (op == RET);
+  sigs->call = op == CALL || op == CALLR || op == RET;
 
 
   // // consumed in Execute
@@ -100,21 +90,20 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
   // // consumed in Memory
   // bool mem_read;
-  sigs->mem_read = (op >= LOAD_BO && op <= LOAD_POST) || (op == RET);
+  sigs->mem_read = op >= LOAD_BO && op <= LOAD_POST;
   // bool mem_write;
-  sigs->mem_write = (op >= STORE_BO && op <= STORE_POST) || (op >= CALL && op <= CALLR);
+  sigs->mem_write = op >= STORE_BO && op <= STORE_POST;
   // bool address_from_execute;
-  sigs->address_from_execute = (op == STORE_BO) || (op == STORE_PRE) || (op == LOAD_BO) || (op == LOAD_PRE) || (op >= CALL && op <= CALLR);
+  sigs->address_from_execute = (op == STORE_BO) || (op == STORE_PRE) || (op == LOAD_BO) || (op == LOAD_PRE);
 
   // // consumed in Writeback
   // bool wval_1_src; // Choose where to get primary wval from
-  sigs->wval_1_src = (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR);
+  sigs->wval_1_src = (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR) || (op >= CALL && op <= CALLR);
 
   // bool w_enable_1;
-  sigs->w_enable_1 = (op >= LOAD_BO && op <= LOAD_POST) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST);
+  sigs->w_enable_1 = (op >= LOAD_BO && op <= LOAD_POST) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST) || op == CALL || op == CALLR;
   // bool w_enable_2;
-  sigs->w_enable_2 = op == LOAD_PRE || op == LOAD_POST || op == STORE_PRE || op == STORE_POST ||
-                      op == CALL || op == CALLR || op == RET;
+  sigs->w_enable_2 = op == LOAD_PRE || op == LOAD_POST || op == STORE_PRE || op == STORE_POST;
 }
 
 void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uint16_t *ex_val, flags_t *flags) {
@@ -154,55 +143,6 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     case ALU_ASR:
       *ex_val = (uint16_t) (((int16_t) opnd_1) >> opnd_2);
       break;
-    case ALU_VADD_BYTE: {
-      // uint16_t low_byte = (opnd_1 & 0xFF + opnd_2 & 0xFF) & 0xFF;
-      // uint16_t high_byte = (opnd_1 >> 8 & 0xFF + opnd_2 >> 8 & 0xFF) & 0xFF;
-      // *ex_val = low_byte | (high_byte << 8);
-      // TODO: Decide if any carry or overflow flags are to be generated as a result of Vector operations.
-      // break;
-    }
-    case ALU_VSUB_BYTE: {
-      // uint16_t low_byte = (opnd_1 & 0xFF - opnd_2 & 0xFF) & 0xFF;
-      // uint16_t high_byte = (opnd_1 >> 8 & 0xFF - opnd_2 >> 8 & 0xFF) & 0xFF;
-      // *ex_val = low_byte | (high_byte << 8);
-      // break;
-    }
-
-      // TODO: Decide if we're keeping the VLSL and VLSR's, or if we should change them.
-    case ALU_VLSL_BYTE: {
-      // uint16_t low_byte = ((opnd_1 & 0xFF) << (opnd_2 & 0xFF)) & 0xFF;
-      // uint16_t high_byte = ((opnd_1 >> 8 & 0xFF) << (opnd_2 >> 8 & 0xFF)) & 0xFF;
-      // *ex_val = low_byte | (high_byte << 8);
-      // break;
-    }
-    case ALU_VLSR_BYTE: {
-      // uint16_t low_byte = ((opnd_1 & 0xFF) >> (opnd_2 & 0xFF)) & 0xFF;
-      // uint16_t high_byte = ((opnd_1 >> 8 & 0xFF) >> (opnd_2 >> 8 & 0xFF)) & 0xFF;
-      // *ex_val = low_byte | (high_byte << 8);
-      // break;
-    }
-    
-    case ALU_VADD_NYBL: {
-      // uint16_t low_nybble = (opnd_1 & 0xF + opnd_2 & 0xF) & 0xF;
-      // uint16_t med_low_nybble = (opnd_1 >> 4 & 0xF + opnd_2 >> 4 & 0xF) & 0xF;
-      // uint16_t med_high_nybble = (opnd_1 >> 8 & 0xF + opnd_2 >> 8 & 0xF) & 0xF;
-      // uint16_t high_nybble = (opnd_1 >> 12 & 0xF + opnd_2 >> 12 & 0xF) & 0xF;
-      // *ex_val = low_nybble | (med_low_nybble << 4) | (med_high_nybble << 4) | (high_nybble << 12);
-      // break;
-    }
-    case ALU_VSUB_NYBL: {
-      // uint16_t low_nybble = (opnd_1 & 0xF - opnd_2 & 0xF) & 0xF;
-      // uint16_t med_low_nybble = (opnd_1 >> 4 & 0xF - opnd_2 >> 4 & 0xF) & 0xF;
-      // uint16_t med_high_nybble = (opnd_1 >> 8 & 0xF - opnd_2 >> 8 & 0xF) & 0xF;
-      // uint16_t high_nybble = (opnd_1 >> 12 & 0xF - opnd_2 >> 12 & 0xF) & 0xF;
-      // *ex_val = low_nybble | (med_low_nybble << 4) | (med_high_nybble << 4) | (high_nybble << 12);
-
-      log_msg(LOG_WARN, "Vector Instructions not implemented yet");
-      break;
-    }
-   
-    // case ALU_VLSL_NYBL:
-    // case ALU_VLSR_NYBL:
     case ALU_MOVL:
       opnd_1 &= 0xFF00; // clear out low byte
       *ex_val = opnd_1 | opnd_2 & 0x00FF; // apply low byte
@@ -214,7 +154,13 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     case ALU_PASS_B: // just pass opnd_2 through. Used only in MOV.
       *ex_val = opnd_2;
       break;
+    case ALU_PASS_A: // pass opnd_1. Used in CALL/CALLR
+      *ex_val = opnd_1;
+    case ALU_DIV: // TODO: Implement MUL and DIV
+    case ALU_MUL:
     case ALU_NONE:
+      break;
+    case ALU_ERR: // TODO: ALU Error Handling
       break;
   }
   if(!set_cc) {
