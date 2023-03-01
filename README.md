@@ -12,9 +12,11 @@ An assembler for this ISA is available, called [cheesegrater](https://github.com
 First, build the project by running `make all`. This will generate the binary `parmesan` in the root directory. Now you can run the emulator on an executable via `parmesan FILENAME`. Run `parmesan -h` for a more complete list of commands.
 
 ## TODO
+- Remove ALU Vector operations and prepare for Vector and FPU Extensions
 - List of valid instructions (not opcodes, instructions)
     - break up ALUop into each sub-instr
 - Write an instruction page template
 - Set up Project page on personal site
 - Add current version banner
 - Correctly implement `h` vs extended immediate functionality for immediate ALU ops. Perhaps an `extract_imm_advanced` func?
+- Write a testing framework for rapid automated testing
