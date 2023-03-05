@@ -2,8 +2,7 @@ parmesan
 .vscode/
 .clangd
 
-tests/asm
-tests/Makefile
+output
 
 # HxD backups
 *.bak

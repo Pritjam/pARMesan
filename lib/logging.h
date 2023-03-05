@@ -4,6 +4,7 @@
 #define VERBOSITY_MAX LOG_FATAL
 
 extern int global_verbosity;
+extern int plain_print;
 
 
 /* This enum represents the various levels used by the logging system. */

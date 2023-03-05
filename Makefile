@@ -10,6 +10,7 @@ build:
 
 clean:
 	@rm -f parmesan *.bak
+	@rm output/*
 
 tests = $(wildcard tests/bin/*)
 run_all_tests = $(foreach file, $(tests), ./parmesan $(file) $(newline) )

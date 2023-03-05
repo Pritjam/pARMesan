@@ -11,6 +11,7 @@
 #include "binloader.h"
 
 int global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
+int plain_print = 0;
 
 int main(int argc, char *argv[]) {
   int opt;
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
   char *memdump_filename = NULL;
   // printf("Hello");
 
-  while ((opt = getopt(argc, argv, "v:m:h")) != -1) {
+  while ((opt = getopt(argc, argv, "v:m:hq")) != -1) {
     switch (opt) {
       case 'v':
         global_verbosity = *optarg - '0';
@@ -32,6 +33,9 @@ int main(int argc, char *argv[]) {
       case 'm':
         memdump_filename = (char *)malloc(strlen(optarg) + 1);
         strcpy(memdump_filename, optarg);
+        break;
+      case 'q':
+        plain_print = 1;
         break;
 
       case 'h':

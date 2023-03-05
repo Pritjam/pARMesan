@@ -24,11 +24,14 @@ static char *severity_colors[] = {
 static char printbuf[BUF_LEN];
 
 static char *format_log_message(log_level severity, char *message) {
-  assert(strlen(severity_colors[severity]) + strlen(severity_strs[severity]) +
-             strlen(message) <
-         BUF_LEN);
-  sprintf(printbuf, "%s\t[%s] %s" ANSI_RESET, severity_colors[severity],
-          severity_strs[severity], message);
+  assert(strlen(severity_colors[severity]) + strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
+  sprintf(printbuf, "%s\t[%s] %s" ANSI_RESET, severity_colors[severity], severity_strs[severity], message);
+  return printbuf;
+}
+
+static char *plain_log_msg(log_level severity, char *message) {
+  assert(strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
+  sprintf(printbuf, "[%s] %s", severity_strs[severity], message);
   return printbuf;
 }
 
@@ -54,7 +57,12 @@ void log_msg(log_level severity, char *message) {
     case LOG_OTHER:
       break;
   }
-  fprintf(out, "%s\n", format_log_message(severity, message));
+
+  if(plain_print) {
+    fprintf(out, "%s\n", plain_log_msg(severity, message));
+  } else {
+    fprintf(out, "%s\n", format_log_message(severity, message));
+  }
   if(do_exit) {
     exit(EXIT_FAILURE);
   }
