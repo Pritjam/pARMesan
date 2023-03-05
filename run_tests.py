@@ -41,6 +41,9 @@ for test_name in test_dirs:
 
   outfile_path = path.join("output", test_name + ".out")
 
+  if not path.exists("output"):
+    os.mkdir("output")
+
   cmd = './parmesan'
   if len(memdump_path):
     cmd += ' -m '
