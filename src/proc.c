@@ -17,6 +17,9 @@ proc_t init_proc() {
   ret.gpr_file[REG_SP] = 0xFFFF; // TODO: Design where stack will actually be
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
+
+  ret.interrupt_cause_register = 0x00;
+  ret.interrupts_enabled = false;
   return ret;
 }
 

@@ -45,6 +45,9 @@ typedef struct proc {
   // float fpr_file[8]; // might one day add floating-point support
   flags_t flags;
   status_t status;
+  uint16_t interrupt_cause_register;
+  bool interrupts_enabled;
+
 
   struct system *bus;
 
