@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #define PARM_VERSION 3
-#define MEMDUMP_VERSION 2
+#define MEMDUMP_VERSION 1
 
 // The header for a pARMesan binary file.
 // This is kind of like an ELF file, in that it's
