@@ -98,10 +98,14 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
   // // consumed in Writeback
   // bool wval_1_src; // Choose where to get primary wval from
-  sigs->wval_1_src = (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR) || (op >= CALL && op <= CALLR);
+  sigs->wval_1_src = (op >= MOVL && op <= MOV) || 
+                     (op >= ADD && op <= ILSR) || 
+                     (op >= CALL && op <= CALLR);
 
   // bool w_enable_1;
-  sigs->w_enable_1 = (op >= LOAD_BO && op <= LOAD_POST) || (op >= MOVL && op <= MOV) || (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST) || op == CALL || op == CALLR;
+  sigs->w_enable_1 = (op >= LOAD_BO && op <= LOAD_POST) || (op == MOVL || op == MOVH || op == MOVH) || 
+                     (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST) || 
+                     (op == CALL || op == CALLR);
   // bool w_enable_2;
   sigs->w_enable_2 = op == LOAD_PRE || op == LOAD_POST || op == STORE_PRE || op == STORE_POST;
 }
