@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
   sys.proc = &proc;
 
   // initialize ram and link it to the sysbus (at this time, no need for encapsulation of mem within a struct)
-  uint16_t *mem = (uint16_t *) calloc(ADDRESS_SPACE_SIZE, sizeof(uint16_t));
+  uint8_t *mem = (uint8_t *) calloc(ADDRESS_SPACE_SIZE, sizeof(uint8_t));
   if (mem == NULL) {
     log_msg(LOG_FATAL, "Failed to allocate space for emulated memory");
   }

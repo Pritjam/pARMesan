@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define INSTRUCTION_WIDTH 2
+
 typedef enum opcode {
   CHGSTAT,
   ALU_RR,

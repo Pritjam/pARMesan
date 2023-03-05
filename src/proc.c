@@ -25,8 +25,8 @@ proc_t init_proc() {
 
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
-  // this line might be replaced by a memory read function call
-  uint16_t insnbits = proc->bus->memory[proc->instruction_pointer];
+  // TODO: this will one day become a general read() call
+  uint16_t insnbits = read_mem(proc->bus, proc->instruction_pointer, 16);
   instr->insnbits = insnbits;
 }
 
@@ -87,11 +87,11 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->opnd_2 = instr->ctrl_sigs.val_b_is_imm ? imm : src_val;
 
   // if this is a call, we need to instead pass the Return Address as opnd1.
-  instr->opnd_1 = instr->ctrl_sigs.call ? proc->instruction_pointer + 1 : instr->opnd_1;
+  instr->opnd_1 = instr->ctrl_sigs.call ? proc->instruction_pointer + INSTRUCTION_WIDTH : instr->opnd_1;
 
   // calculate branch PC
   if(instr->op == JMP || instr->op == JCC || instr->op == CALL) {
-    instr->branch_pc = proc->instruction_pointer + imm;
+    instr->branch_pc = proc->instruction_pointer + imm * 2;
   } else if(instr->op == JMPR || instr->op == CALLR || instr->op == RET) {
     // after all, a RET is the same as `JMPR %lr`
     instr->branch_pc = dst_trf_val;
@@ -135,12 +135,14 @@ void memory(proc_t *proc, instr_t *instr) {
       sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
       log_msg(LOG_OUTPUT, msg);
     }
-    proc->bus->memory[mem_address] = mem_wval;
+    // TODO: implement 8 bit handling
+    write_mem(proc->bus, mem_address, mem_wval, 16);
   }
 
   // save value read in from memory into instr struct
   if(instr->ctrl_sigs.mem_read) {
-    instr->mem_readval = proc->bus->memory[mem_address];
+    // TODO: implement 8 bit handling
+    instr->mem_readval = read_mem(proc->bus, mem_address, 16);
   }
 }
 
@@ -165,7 +167,7 @@ void writeback(proc_t *proc, instr_t *instr) {
   } else if(instr->op == JCC && instr->cond_holds) {
     proc->instruction_pointer = instr->branch_pc;
   } else {
-    proc->instruction_pointer += 1;
+    proc->instruction_pointer += INSTRUCTION_WIDTH;
   }
 
   if(instr->op == HLT) {

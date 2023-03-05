@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void load_binary(uint16_t *emulated_mem, FILE *file) {
+void load_binary(uint8_t *emulated_mem, FILE *file) {
   parmesan_rind_t header;
   // read in header
   fread(&header, sizeof(parmesan_rind_t), 1, file);
@@ -16,27 +16,11 @@ void load_binary(uint16_t *emulated_mem, FILE *file) {
   }
 
   // read the file in
-  // TODO: ENDIANNESS!!! This is massively unsafe because endianness exists!
-  // There's a standard for the file's byte order, sure 
-    // (the pARMesan standard, while not written yet, will likely specify big-endian)
-  // However, the endianness of the machine running this emulator CANNOT be assumed.
-  // This read has to be done in a safe way.
-  // fread(emulated_mem, sizeof(uint16_t), size / sizeof(uint16_t), file);
-
-  // Hacky workaround: Read it as an array of bytes, then manually make uint16s. This is not a good way to do this.
-  fread(emulated_mem, sizeof(uint8_t), header.length / sizeof(uint8_t), file);
-  uint8_t *mem_byte_ptr = (uint8_t *) emulated_mem;
-  for(long i = 0; i < header.length; i += 2) {
-    uint8_t high_byte = mem_byte_ptr[i];
-    uint8_t low_byte = mem_byte_ptr[i + 1];
-    uint16_t instr_word = ((uint16_t) high_byte) << 8;
-    instr_word |= low_byte;
-    emulated_mem[i / 2] = instr_word;
-  }
+  fread(emulated_mem, sizeof(uint8_t), header.length, file);
 }
 
 
-void load_memory_image(uint16_t *emulated_mem, FILE *file) {
+void load_memory_image(uint8_t *emulated_mem, FILE *file) {
   feta_header_t header;
   // read in header
   fread(&header, sizeof(feta_header_t), 1, file);
@@ -54,7 +38,7 @@ void load_memory_image(uint16_t *emulated_mem, FILE *file) {
   // check version number
   if(header.version != MEMDUMP_VERSION) {
     char msg[70];
-    sprintf(msg, "Bad file version for memdump file! Found %d, expected %d.", header.version, PARM_VERSION);
+    sprintf(msg, "Bad file version for memdump file! Found %d, expected %d.", header.version, MEMDUMP_VERSION);
     log_msg(LOG_FATAL, msg);
   }
 
@@ -66,14 +50,7 @@ void load_memory_image(uint16_t *emulated_mem, FILE *file) {
     // read segment header
     fread(&segment, sizeof(memseg_header_t), 1, file);
     // read in the segment as bytes first
-    fread(emulated_mem + segment.start_address, sizeof(uint8_t), 2 * segment.length, file);
+    fread(emulated_mem + segment.start_address, sizeof(uint8_t), segment.length, file);
     // TODO: checksum calculation would happen here
-    // correct endianness
-    uint8_t *mem_byte_ptr = (uint8_t *) emulated_mem;
-    for(int i = segment.start_address; i < segment.start_address + segment.length; i++) {
-      uint16_t high_byte = *(mem_byte_ptr + 2 * i);
-      uint16_t low_byte = *(mem_byte_ptr + 2 * i + 1);
-      emulated_mem[i] = (high_byte << 8) | low_byte;
-    }
   }
 }

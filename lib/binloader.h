@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #define PARM_VERSION 3
-#define MEMDUMP_VERSION 1
+#define MEMDUMP_VERSION 2
 
 // The header for a pARMesan binary file.
 // This is kind of like an ELF file, in that it's
@@ -19,7 +19,7 @@ typedef struct parmesan_rind {
 } parmesan_rind_t;
 
 // Takes in a file pointer for a pARMesan binary file and loads it into memory starting at offset 0.
-extern void load_binary(uint16_t *emulated_mem, FILE *file);
+extern void load_binary(uint8_t *emulated_mem, FILE *file);
 
 typedef struct feta_header {
   char magic_identifier[4]; // should be "feta"
@@ -36,6 +36,6 @@ typedef struct memseg_header {
 
 // Takes in a file pointer for a pARMesan memory dump file and reads it into memory.
 // Offset and size information is contained within the pARMesan memory dump file header.
-extern void load_memory_image(uint16_t *emulated_mem, FILE *file);
+extern void load_memory_image(uint8_t *emulated_mem, FILE *file);
 
 #endif
