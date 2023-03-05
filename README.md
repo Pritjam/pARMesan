@@ -11,6 +11,12 @@ An assembler for this ISA is available, called [cheesegrater](https://github.com
 ## Usage
 First, build the project by running `make all`. This will generate the binary `parmesan` in the root directory. Now you can run the emulator on an executable via `parmesan FILENAME`. Run `parmesan -h` for a more complete list of commands.
 
+## Test Format
+
+Each test is a single directory containing the assembly file in SWISS format, a file containing the expected output, and the executable file (currently in PARM format). Optionally, a directory can also contain a FETA memory dump file which will also be incorporated into the test.
+
+After running the test(s), output will be stored in a `.out` file in the `output` directory.
+
 ## TODO
 - Remove ALU Vector operations and prepare for Vector and FPU Extensions
 - List of valid instructions (not opcodes, instructions)
