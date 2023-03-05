@@ -10,9 +10,7 @@ build:
 
 clean:
 	@rm -f parmesan *.bak
-	@rm output/*
+	@rm -rf output/
 
-tests = $(wildcard tests/bin/*)
-run_all_tests = $(foreach file, $(tests), ./parmesan $(file) $(newline) )
 evaluate: clean build
-	$(run_all_tests)
+	@python3 run_tests.py --all
