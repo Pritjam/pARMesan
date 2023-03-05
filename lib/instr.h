@@ -79,17 +79,20 @@ typedef enum alu_op {
   ALU_ERR = -1
 } alu_op_t;
 
-typedef enum wval_src {
-  ALU_OUTPUT,
-  VAL_MEM,
-  SEQUENTIAL_SUCCESSOR
-} wval_src_t;
+// this isn't currently used
+// typedef enum wval_src {
+//   ALU_OUTPUT,
+//   VAL_MEM,
+//   SEQUENTIAL_SUCCESSOR
+// } wval_src_t;
 
 typedef struct ctrl_sigs {
   // consumed in Decode
-  bool val_a_sel; // if true, val_a comes from src, else from dst
-                  // this is the case only in load/store instrs, as
-                  // the ALU source is not the same as the data source/dst
+  
+  // if true, val_a comes from src, else from dst
+  // this is the case only in load/store instrs, as
+  // the ALU source is not the same as the data source/dst
+  bool val_a_sel; 
   
   bool val_b_is_imm; // if true, ALU second operand is immediate
   bool call;
