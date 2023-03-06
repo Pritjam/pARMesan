@@ -15,10 +15,10 @@
 .ADD_AX_BX_CX:
   ADD %ax, %bx
 ; push %lr before making another call
-  STORE %lr, [%sp, #-1]!
+  STORE %lr, [%sp, #-2]!
   CALL .ADD_AX_CX
 ; pop %lr
-  LOAD %lr, [%sp], #1
+  LOAD %lr, [%sp], #2
   RET
 
 .ADD_AX_CX:
