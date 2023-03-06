@@ -12,12 +12,12 @@ typedef enum opcode {
   ALU_RI,
   FVOP,
   LOAD,
-  LDIX,
-  LDXP,
+  LDSP,
+  LDP,
   MOVL,
   STORE,
-  STIX,
-  STXP,
+  STSP,
+  STP,
   MOVH,
   MOV,
   RET,
@@ -55,10 +55,10 @@ typedef enum opcode {
   ICMP,
   ILSL,
   ILSR,
-  LDXPRE,
-  LDXPOST,
-  STXPRE,
-  STXPOST,
+  LDPRE,
+  LDPOST,
+  STPRE,
+  STPOST,
   ERR = -1
 } opcode_t;
 
@@ -145,8 +145,8 @@ typedef struct instr {
 } instr_t;
 
 static opcode_t TOPLEVEL_LOOKUP[32] = {
-    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD, LDIX, LDXP, MOVL,
-    STORE, STIX, STXP, MOVH,   RET,    JCC,     MOV,       INT,
+    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD, LDSP, LDP, MOVL,
+    STORE, STSP, STP, MOVH,   RET,    JCC,     MOV,       INT,
     JMP,      JMPR,      CALL,       CALLR, ERR,     ERR,      ERR,       ERR,
     ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
 

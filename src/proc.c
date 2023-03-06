@@ -55,8 +55,8 @@ void decode(proc_t *proc, instr_t *instr) {
   // TODO: Implement hw function for mov? Is that needed?
 
   // determine bytewidth for mem operation (byte or word) from the "w" bit
-  int width = extract_unsigned_immediate(instr->insnbits, 10, 1);
-  instr->mem_bytewidth = width ? 2 : 1;
+  int width = extract_unsigned_immediate(instr->insnbits, 9, 1);
+  instr->mem_bytewidth = width == 1 ? 2 : 1;
 
   // extract immediate
   uint16_t imm = get_immediate(instr->insnbits, instr->op);
@@ -64,8 +64,12 @@ void decode(proc_t *proc, instr_t *instr) {
   // perform register reads
   int dst = instr->ctrl_sigs.call ? REG_LR : extract_unsigned_immediate(instr->insnbits, 0, 3);
   int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
-  if(instr->op == LDIX || instr->op == STIX)
-    src = REG_IX;
+  if(instr->op == LDSP || instr->op == STSP)
+    src = REG_SP;
+  if(instr->op == LDPOST || instr->op == LDPRE || instr->op == STPOST || instr->op == STPRE) {
+    int s = extract_unsigned_immediate(instr->insnbits, 8, 1);
+    src = s == 1 ? REG_SP : REG_IX;
+  }
   uint16_t dst_trf_val = proc->gpr_file[dst];
   uint16_t src_val = proc->gpr_file[src];
   // we will write the value of the trf register to memory
