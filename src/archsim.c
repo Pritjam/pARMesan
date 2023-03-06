@@ -10,6 +10,8 @@
 #include "system.h"
 #include "binloader.h"
 
+#define INSTRUCTIONS_MAX 1000
+
 int global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
 int plain_print = 0;
 
@@ -100,6 +102,7 @@ int main(int argc, char *argv[]) {
   }
 
 
+  int instructions = 0;
   
   // main CPU loop goes here
   while(proc.status != STAT_HALT) {
@@ -108,6 +111,10 @@ int main(int argc, char *argv[]) {
     execute(&proc, &instr);
     memory(&proc, &instr);
     writeback(&proc, &instr);
+    instructions++;
+    if(instructions > INSTRUCTIONS_MAX) {
+      break;
+    }
   }
 
   // closing remarks go here
