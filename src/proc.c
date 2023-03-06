@@ -14,7 +14,6 @@ proc_t init_proc() {
     ret.gpr_file[i] = 0;
   }
   // initialize SP to this funky value
-  ret.gpr_file[REG_SP] = 0xFFFF; // TODO: Design where stack will actually be
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
 
@@ -55,7 +54,7 @@ void decode(proc_t *proc, instr_t *instr) {
   // TODO: Implement hw function for mov? Is that needed?
 
   // determine bytewidth for mem operation (byte or word) from the "w" bit
-  int width = extract_unsigned_immediate(instr->insnbits, 9, 1);
+  int width = extract_unsigned_immediate(instr->insnbits, 10, 1);
   instr->mem_bytewidth = width == 1 ? 2 : 1;
 
   // extract immediate

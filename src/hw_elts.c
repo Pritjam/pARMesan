@@ -18,11 +18,11 @@ void resolve_opcode(instr_t *instr) {
     instr->op = ALU_RI_LOOKUP[secondary_op_bits];
   }
   if (instr->op == LDP) {
-    uint16_t h = extract_unsigned_immediate(instr->insnbits, 10, 1);
+    uint16_t h = extract_unsigned_immediate(instr->insnbits, 9, 1);
     instr->op = h ? LDPOST : LDPRE;
   }
   if (instr->op == STP) {
-    uint16_t h = extract_unsigned_immediate(instr->insnbits, 10, 1);
+    uint16_t h = extract_unsigned_immediate(instr->insnbits, 9, 1);
     instr->op = h ? STPOST : STPRE;
   }
 }
