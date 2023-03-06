@@ -142,7 +142,8 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->w_enable_1 = op == LOAD || op == LDSP || op == LDPRE || op == LDPOST || 
                     (op == MOVL || op == MOVH || op == MOVH) || 
                     (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST) || 
-                    (op == CALL || op == CALLR);
+                    (op == CALL || op == CALLR) ||
+                    (op == MOV);
   // bool w_enable_2;
   // Only if we writeback to index register
   sigs->w_enable_2 = op == LDPRE || op == LDPOST || op == STPRE || op == STPOST;
