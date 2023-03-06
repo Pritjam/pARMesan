@@ -16,7 +16,7 @@ For each of the registers `%ax’`, `%bx’`, `%cx’`, `%dx’`, and `%FLAGS'`,
 These shadow registers are intended to be used with interrupt handling, as they preserve user data in the non-shadow registers and user flags in the non-shadow flags register. However, on systems without interrupts (or if interrupts are temporarily disabled), the shadow registers could be used for very fast leaf subroutines, bypassing the need to save the first 4 registers on the stack.
 
 ### Memory
-Memory is word-addressed. 64K addresses are possible, meaning this CPU can address up to 128KB of RAM, arranged as 64Kx16. Memory accesses are assumed to be fast enough that there is no pipeline delay imposed on the system. This is consistent with older 16-bit CPUs such as the Intel 8086, which lacked any onboard cache.
+Memory is byte-addressed. 64K addresses are possible, meaning this CPU can address up to 64KB of RAM, arranged as 64Kx8. Memory accesses are assumed to be fast enough that there is no pipeline delay imposed on the system. This is consistent with older 16-bit CPUs such as the Intel 8086, which lacked any onboard cache.
 
 ---
 
