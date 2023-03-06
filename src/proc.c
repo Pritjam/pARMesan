@@ -54,9 +54,9 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->alu_op = determine_alu_op(instr->op, h);
   // TODO: Implement hw function for mov? Is that needed?
 
-  // determine bytewidth for mem operation (byte or word)
-  int w = extract_unsigned_immediate(instr->insnbits, 10, 1);
-  instr->mem_bytewidth = w ? 2 : 1;
+  // determine bytewidth for mem operation (byte or word) from the "w" bit
+  int width = extract_unsigned_immediate(instr->insnbits, 10, 1);
+  instr->mem_bytewidth = width ? 2 : 1;
 
   // extract immediate
   uint16_t imm = get_immediate(instr->insnbits, instr->op);

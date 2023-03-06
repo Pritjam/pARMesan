@@ -18,12 +18,12 @@ void resolve_opcode(instr_t *instr) {
     instr->op = ALU_RI_LOOKUP[secondary_op_bits];
   }
   if (instr->op == LDXP) {
-    uint16_t w = extract_unsigned_immediate(instr->insnbits, 10, 1);
-    instr->op = w ? LDXPOST : LDXPRE;
+    uint16_t h = extract_unsigned_immediate(instr->insnbits, 10, 1);
+    instr->op = h ? LDXPOST : LDXPRE;
   }
   if (instr->op == STXP) {
-    uint16_t w = extract_unsigned_immediate(instr->insnbits, 10, 1);
-    instr->op = w ? STXPOST : STXPRE;
+    uint16_t h = extract_unsigned_immediate(instr->insnbits, 10, 1);
+    instr->op = h ? STXPOST : STXPRE;
   }
 }
 
