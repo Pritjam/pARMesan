@@ -9,7 +9,7 @@ system_bus_t init_system() {
 
 // BIG ENDIAN FORMS
 uint16_t read_mem(system_bus_t *sys, uint16_t address, uint16_t bit_width) {
-  if(bit_width == 8) {
+  if(bit_width == 1) {
     uint16_t low = sys->memory[address];
     return low;
   }
@@ -20,7 +20,7 @@ uint16_t read_mem(system_bus_t *sys, uint16_t address, uint16_t bit_width) {
 }
 
 void write_mem(system_bus_t *sys, uint16_t address, uint16_t value, uint16_t bit_width) {
-  if(bit_width == 8) {
+  if(bit_width == 1) {
     uint8_t low = value & 0xFF;
     sys->memory[address] = low;
     return;
