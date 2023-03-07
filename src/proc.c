@@ -3,6 +3,7 @@
 #include "instr.h"
 #include "logging.h"
 #include "hw_elts.h"
+#include "system.h"
 
 proc_t init_proc() {
   proc_t ret;
@@ -14,7 +15,6 @@ proc_t init_proc() {
     ret.gpr_file[i] = 0;
   }
   // initialize SP to this funky value
-  ret.gpr_file[REG_SP] = 0xFFFF; // TODO: Design where stack will actually be
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
 
@@ -26,7 +26,7 @@ proc_t init_proc() {
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
   // TODO: this will one day become a general read() call
-  uint16_t insnbits = read_mem(proc->bus, proc->instruction_pointer, 16);
+  uint16_t insnbits = read_instr_be(proc->bus, proc->instruction_pointer, INSTRUCTION_WIDTH);
   instr->insnbits = insnbits;
 }
 
@@ -35,6 +35,7 @@ void decode(proc_t *proc, instr_t *instr) {
   uint16_t top_level_op_bits = extract_unsigned_immediate(instr->insnbits, 11, 5);
   instr->op = TOPLEVEL_LOOKUP[top_level_op_bits];
 
+  // TODO: This will eventually become an exception when interrupts are implemented
   if(instr->op == ERR) {
     proc->status = STAT_ERR;
     char msg[50];
@@ -43,18 +44,7 @@ void decode(proc_t *proc, instr_t *instr) {
   }
 
   // resolve actual opcode for those that require it
-  if(instr->op == CHGSTAT) {
-    uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 8, 3);
-    instr->op = CHGSTAT_LOOKUP[secondary_op_bits];
-  }
-  if(instr->op == ALU_RR) {
-    uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 7, 4);
-    instr->op = ALU_RR_LOOKUP[secondary_op_bits];
-  }
-  if(instr->op == ALU_RI) {
-    uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 8, 3);
-    instr->op = ALU_RI_LOOKUP[secondary_op_bits];
-  }
+  resolve_opcode(instr);
 
   // get control signals
   populate_control_signals(&instr->ctrl_sigs, instr->op);
@@ -64,6 +54,9 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->alu_op = determine_alu_op(instr->op, h);
   // TODO: Implement hw function for mov? Is that needed?
 
+  // determine bytewidth for mem operation (byte or word) from the "w" bit
+  int width = extract_unsigned_immediate(instr->insnbits, 10, 1);
+  instr->mem_bytewidth = width == 1 ? 2 : 1;
 
   // extract immediate
   uint16_t imm = get_immediate(instr->insnbits, instr->op);
@@ -71,6 +64,12 @@ void decode(proc_t *proc, instr_t *instr) {
   // perform register reads
   int dst = instr->ctrl_sigs.call ? REG_LR : extract_unsigned_immediate(instr->insnbits, 0, 3);
   int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
+  if(instr->op == LDSP || instr->op == STSP)
+    src = REG_SP;
+  if(instr->op == LDPOST || instr->op == LDPRE || instr->op == STPOST || instr->op == STPRE) {
+    int s = extract_unsigned_immediate(instr->insnbits, 8, 1);
+    src = s == 1 ? REG_SP : REG_IX;
+  }
   uint16_t dst_trf_val = proc->gpr_file[dst];
   uint16_t src_val = proc->gpr_file[src];
   // we will write the value of the trf register to memory
@@ -87,7 +86,8 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->opnd_2 = instr->ctrl_sigs.val_b_is_imm ? imm : src_val;
 
   // if this is a call, we need to instead pass the Return Address as opnd1.
-  instr->opnd_1 = instr->ctrl_sigs.call ? proc->instruction_pointer + INSTRUCTION_WIDTH : instr->opnd_1;
+  if (instr->ctrl_sigs.call)
+    instr->opnd_1 = proc->instruction_pointer + INSTRUCTION_WIDTH;
 
   // calculate branch PC
   if(instr->op == JMP || instr->op == JCC || instr->op == CALL) {
@@ -136,13 +136,13 @@ void memory(proc_t *proc, instr_t *instr) {
       log_msg(LOG_OUTPUT, msg);
     }
     // TODO: implement 8 bit handling
-    write_mem(proc->bus, mem_address, mem_wval, 16);
+    write_mem(proc->bus, mem_address, mem_wval, instr->mem_bytewidth);
   }
 
   // save value read in from memory into instr struct
   if(instr->ctrl_sigs.mem_read) {
     // TODO: implement 8 bit handling
-    instr->mem_readval = read_mem(proc->bus, mem_address, 16);
+    instr->mem_readval = read_mem(proc->bus, mem_address, instr->mem_bytewidth);
   }
 }
 

@@ -22,12 +22,6 @@ These instructions have only a register-register version:
 - TEST
 - ASR
 
-There are also 4 vector operations which can be done at either byte-level or nybble-level (8 bits vs 4 bits):
-- VADD
-- VSUB
-- VLSL
-- VLSR
-
 ### Data Movement
 There are 3 Data Movement instructions. Two are used to load the low and high byte of a register, respectively. The last is used to transfer data between registers.
 - MOVL
@@ -43,8 +37,10 @@ In Pre-Indexed, the same address calculation occurs, but the calculated address 
 
 In Post-Indexed, the base address is used as the memory address, but the calculated address (with the offset added in) is written back into the base register.
 
-- LOAD
-- STORE
+- LOADW
+- LOADB
+- STOREW
+- STOREB
 
 ### Control Transfer
 There are a few options for control transfer. Jumps and Calls can be direct (to a label) or indirect (to a register). Conditional jumps can only be direct.

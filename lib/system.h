@@ -34,7 +34,9 @@ extern system_bus_t init_system();
 // extern void write_8(system_bus_t *sys, uint16_t address, uint8_t value);
 
 // For now, just use these
-extern uint16_t read_mem(system_bus_t *sys, uint16_t address, uint16_t bit_width);
-extern void write_mem(system_bus_t *sys, uint16_t address, uint16_t value, uint16_t bit_width);
+
+extern uint16_t read_instr_be(system_bus_t *sys, uint16_t address, uint16_t byte_width);
+extern uint16_t read_mem(system_bus_t *sys, uint16_t address, uint16_t byte_width);
+extern void write_mem(system_bus_t *sys, uint16_t address, uint16_t value, uint16_t byte_width);
 
 #endif

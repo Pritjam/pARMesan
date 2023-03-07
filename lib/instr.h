@@ -11,13 +11,13 @@ typedef enum opcode {
   ALU_RR,
   ALU_RI,
   FVOP,
-  LOAD_BO,
-  LOAD_PRE,
-  LOAD_POST,
+  LOAD,
+  LDSP,
+  LDP,
   MOVL,
-  STORE_BO,
-  STORE_PRE,
-  STORE_POST,
+  STORE,
+  STSP,
+  STP,
   MOVH,
   MOV,
   RET,
@@ -55,6 +55,10 @@ typedef enum opcode {
   ICMP,
   ILSL,
   ILSR,
+  LDPRE,
+  LDPOST,
+  STPRE,
+  STPOST,
   ERR = -1
 } opcode_t;
 
@@ -120,6 +124,7 @@ typedef struct instr {
   // generated in Decode
   opcode_t op;            // opcode of the instruction
   uint16_t mem_writeval;  // value to be written to mem
+  uint16_t mem_bytewidth; // how wide (in bytes) the read/write is (only applicable to loads or stores)
   uint16_t opnd_1;        // ALU's first value
   uint16_t opnd_2;        // ALU's second value
   alu_op_t alu_op;        // ALU operation to perform
@@ -140,8 +145,8 @@ typedef struct instr {
 } instr_t;
 
 static opcode_t TOPLEVEL_LOOKUP[32] = {
-    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD_BO, LOAD_PRE, LOAD_POST, MOVL,
-    STORE_BO, STORE_PRE, STORE_POST, MOVH,   RET,    JCC,     MOV,       INT,
+    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD, LDSP, LDP, MOVL,
+    STORE, STSP, STP, MOVH,   RET,    JCC,     MOV,       INT,
     JMP,      JMPR,      CALL,       CALLR, ERR,     ERR,      ERR,       ERR,
     ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
 
