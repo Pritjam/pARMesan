@@ -10,9 +10,9 @@ During execution of any program, the currently executing procedure has an area o
 
 The Stack Frame is bounded by the values stored in the Base Pointer register `%bp` and the Stack Pointer register `%sp`. `%sp` points to the word in the Stack Frame with the lowest address, which is also the bottom of the stack. `%bp` points to the lower word of the most recently created Frame Record. 
 
-When a procedure is called, the CALL instruction automatically saves the Return Address to the Link Register. Within the procedure, `%lr` and `%bp` are pushed onto the stack, then the current value of `%sp` is copied into `%bp`. Next, the stack is expanded by subtracting from `%sp` in order to open up space for any local variables or saved registers. This sequence of steps makes up the prologue of a procedre call.
+When a procedure is called, the CALL instruction automatically saves the Return Address to the Link Register. Within the procedure, `%lr` and `%bp` are pushed onto the stack, then the current value of `%sp` is copied into `%bp`. Next, the stack is expanded by subtracting from `%sp` in order to open up space for any local variables or saved registers. This sequence of steps makes up the prologue of a procedure call.
 
-When it is time to return from a procedure, the value in `%bp` is moved into `%sp`. This closes down the space previously allocated for the Stack Frame and leaves `%sp` pointing to the Frame Record. `%bp` can now be popped from the stack, which causes `%bp` to point to the Frame Record of the hierarchically previous procedure call. `%sp` now points to the saved value of the Link Register, which can now be popped. This sequence of instructions is called the epilogue. Finally, the RET instruction can occur, continuing execution of the parent routine.
+When it is time to return from a procedure, the value in `%bp` is copied into `%sp`. This closes down the space previously allocated for the Stack Frame and leaves `%sp` pointing to the Frame Record. `%bp` can now be popped from the stack, which causes `%bp` to point to the Frame Record of the hierarchically previous procedure call. `%sp` now points to the saved value of the Link Register, which can be popped. This sequence of instructions is called the epilogue. Finally, the RET instruction can occur, continuing execution of the parent routine.
 
 ### Parameters
 

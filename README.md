@@ -1,8 +1,13 @@
 # pARMesan
 
+## Project Status
+The 1.0 release of this project is ready. The architecture specification is also at version 1.0.  
+The PARM File Format is currently at revision 4.  
+The FETA memory image format is currently at revision 1.
+
 ## General Info
 
-pARMesan is a 16-bit CPU architecture based on AArch64 but with some x86 inspiration. It's meant to be an academic project to get some experience with the nuances of designing an architecture. A pARMesan CPU has 8 general-purpose 16-bit registers and a 16-bit instruction pointer. It can address 128KB of word-addressable ram, and has support for either memory-mapped IO or explicit IO (to be decided in a later revision). More detailed documentation can be found in the [docs](docs/index.md). This repo also contains a C implementation of the architecture.
+pARMesan is a 16-bit CPU architecture based on AArch64 but with some x86 inspiration. It's meant to be an academic project to get some experience with the nuances of designing an architecture. A pARMesan CPU has 8 general-purpose 16-bit registers and a 16-bit instruction pointer. It can address 64KB of byte-addressable ram, and has support for memory-mapped IO. More detailed documentation can be found in the [docs](docs/index.md). This repo also contains a C implementation of the architecture.
 
 A Rust implementation of this CPU is planned, and a little work has been done towards that project, found in it's Git repo: [bytesize](https://github.com/Pritjam/bytesize).
 
@@ -18,11 +23,11 @@ Each test is a single directory containing the assembly file in SWISS format, a 
 After running the test(s), output will be stored in a `.out` file in the `output` directory.
 
 ## TODO
-- Remove ALU Vector operations and prepare for Vector and FPU Extensions
+- Determine endianness
+  - Currently, instructions are read as Big Endian while data is read as Little Endian.
 - List of valid instructions (not opcodes, instructions)
-    - break up ALUop into each sub-instr
+  - break up ALUop into each sub-instr
 - Write an instruction page template
 - Set up Project page on personal site
-- Add current version banner
 - Correctly implement `h` vs extended immediate functionality for immediate ALU ops. Perhaps an `extract_imm_advanced` func?
 - Write a testing framework for rapid automated testing
