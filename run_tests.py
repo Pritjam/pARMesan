@@ -53,6 +53,7 @@ for test_name in test_dirs:
   cmd += path.join(test_dir_path, test_name)
   cmd += ' > '
   cmd += outfile_path
+  cmd += ' 2>&1 '
   os.system(cmd)
 
   # Now to compare the output
