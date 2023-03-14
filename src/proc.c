@@ -14,6 +14,9 @@ proc_t init_proc() {
   for(int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
+  for(int i = 0; i < 4; i++) {
+    ret.shadow_regs[i] = 0;
+  }
   // initialize SP to this funky value
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
@@ -50,8 +53,7 @@ void decode(proc_t *proc, instr_t *instr) {
   populate_control_signals(&instr->ctrl_sigs, instr->op);
 
   // determine ALU operation
-  int h = extract_unsigned_immediate(instr->insnbits, 6, 1);
-  instr->alu_op = determine_alu_op(instr->op, h);
+  instr->alu_op = determine_alu_op(instr->op);
   // TODO: Implement hw function for mov? Is that needed?
 
   // determine bytewidth for mem operation (byte or word) from the "w" bit
@@ -106,7 +108,6 @@ void execute(proc_t *proc, instr_t *instr) {
   // make a call to ALU
   run_alu(instr->opnd_1, instr->opnd_2, instr->alu_op, instr->ctrl_sigs.set_cc, &instr->ex_val, &proc->flags);
   // determine if condition holds
-  // TODO: Write check_cond fn
   instr->cond_holds = check_cond(instr->cond, proc->flags);
 
 }
@@ -135,13 +136,13 @@ void memory(proc_t *proc, instr_t *instr) {
       sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
       log_msg(LOG_OUTPUT, msg);
     }
-    // TODO: implement 8 bit handling
+    // TODO: implement handling 8-bit STOREB
     write_mem(proc->bus, mem_address, mem_wval, instr->mem_bytewidth);
   }
 
   // save value read in from memory into instr struct
   if(instr->ctrl_sigs.mem_read) {
-    // TODO: implement 8 bit handling
+    // TODO: implement handling 8-bit LOADB
     instr->mem_readval = read_mem(proc->bus, mem_address, instr->mem_bytewidth);
   }
 }
@@ -168,6 +169,15 @@ void writeback(proc_t *proc, instr_t *instr) {
     proc->instruction_pointer = instr->branch_pc;
   } else {
     proc->instruction_pointer += INSTRUCTION_WIDTH;
+  }
+
+  // Make updates to state if necessary
+  if(instr->op == EXX) {
+    swap_shadow_regs(proc);
+  }
+
+  if(instr->op == EXF) {
+    swap_shadow_flags(proc);
   }
 
   if(instr->op == HLT) {

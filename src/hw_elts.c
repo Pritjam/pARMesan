@@ -27,7 +27,7 @@ void resolve_opcode(instr_t *instr) {
   }
 }
 
-alu_op_t determine_alu_op(opcode_t op, int h) {
+alu_op_t determine_alu_op(opcode_t op) {
   switch(op) {
     case LOAD: case LDSP: case LDPRE: case LDPOST: 
     case STORE: case STSP: case STPRE: case STPOST:
@@ -256,4 +256,18 @@ bool check_cond(condition_code_t cnd, flags_t flags) {
     case CC:
       return !flags.C;
   }
+}
+
+void swap_shadow_regs(proc_t *proc) {
+  for(int i = 0; i < 4; i++) {
+    uint16_t temp = proc->gpr_file[i];
+    proc->gpr_file[i] = proc->shadow_regs[i];
+    proc->shadow_regs[i] = temp;
+  }
+}
+
+void swap_shadow_flags(proc_t *proc) {
+  flags_t temp = proc->flags;
+  proc->flags = proc->shadow_flags;
+  proc->shadow_flags = temp;
 }
