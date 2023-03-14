@@ -22,13 +22,3 @@ First, build the project by running `make all`. This will generate the binary `p
 Each test is a single directory containing the assembly file in SWISS format, a file containing the expected output, and the executable file (currently in PARM format). Optionally, a directory can also contain a FETA memory dump file which will also be incorporated into the test.
 
 After running the test(s), output will be stored in a `.out` file in the `output` directory.
-
-## TODO
-- Determine endianness
-  - Currently, instructions are read as Big Endian while data is read as Little Endian.
-- List of valid instructions (not opcodes, instructions)
-  - break up ALUop into each sub-instr
-- Write an instruction page template
-- Set up Project page on personal site
-- Correctly implement `h` vs extended immediate functionality for immediate ALU ops. Perhaps an `extract_imm_advanced` func?
-- Write a testing framework for rapid automated testing
