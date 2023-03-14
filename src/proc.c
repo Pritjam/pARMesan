@@ -26,7 +26,7 @@ proc_t init_proc() {
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
   // TODO: this will one day become a general read() call
-  uint16_t insnbits = read_instr_be(proc->bus, proc->instruction_pointer, INSTRUCTION_WIDTH);
+  uint16_t insnbits = read_mem(proc->bus, proc->instruction_pointer, INSTRUCTION_WIDTH);
   instr->insnbits = insnbits;
 }
 
