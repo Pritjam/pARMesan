@@ -144,19 +144,33 @@ typedef struct instr {
 
 } instr_t;
 
+/**
+* Lookup table for top-level opcodes.
+* A mapping from the first 5 bits of an instruction to the corresponding opcode.
+* Also called an "itable".
+* Some of these instructions are placeholders and must be resolved with resolve_opcode, like "CHGSTAT" or "ALU_RR"
+*/
 static opcode_t TOPLEVEL_LOOKUP[32] = {
     CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD, LDSP, LDP, MOVL,
     STORE, STSP, STP, MOVH,   RET,    JCC,     MOV,       INT,
     JMP,      JMPR,      CALL,       CALLR, ERR,     ERR,      ERR,       ERR,
     ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
 
+/**
+* Lookup table to resolve CHGSTAT instructions.
+*/
 static opcode_t CHGSTAT_LOOKUP[8] = {HLT, EXX, EXF, EI, DI, ERR, ERR, NOP};
 
+/**
+* Lookup table to resolve ALU_RR instructions.
+*/
 static opcode_t ALU_RR_LOOKUP[16] = {
   ADD,  SUB,  AND,   OR,   XOR,   CMP,   LSL,   LSR,  
   ADC,  SBC,  TEST,  ASR,  MUL,  DIV,  ERR,  ERR};
 
-static opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR,
-                                    IXOR, ICMP, ILSL, ILSR};
+/**
+* Lookup table to resolve ALU_RI instructions.
+*/
+static opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR, IXOR, ICMP, ILSL, ILSR};
 
 #endif
