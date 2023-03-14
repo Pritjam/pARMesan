@@ -1,8 +1,9 @@
 # pARMesan
 
 ## Project Status
-The 1.0 release of this project is ready. The architecture specification is also at version 1.0.  
-The PARM File Format is currently at revision 4.  
+The architecture specification is at version 1.1.  
+The simulator implements architecture specification 1.1. 
+The PARM File Format is currently at revision 5.  
 The FETA memory image format is currently at revision 1.
 
 ## General Info
