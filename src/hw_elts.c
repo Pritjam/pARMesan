@@ -4,6 +4,8 @@
 #include "logging.h"
 
 
+// DECODE
+
 void resolve_opcode(instr_t *instr) {
   if(instr->op == CHGSTAT) {
     uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 8, 3);
@@ -152,6 +154,8 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->w_enable_2 = op == LDPRE || op == LDPOST || op == STPRE || op == STPOST;
 }
 
+// EXECUTE
+
 void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uint16_t *ex_val, flags_t *flags) {
   // Run the ALU computation
   switch(alu_op) {
@@ -260,6 +264,8 @@ bool check_cond(condition_code_t cnd, flags_t flags) {
       return !flags.C;
   }
 }
+
+// WRITEBACK
 
 void swap_shadow_regs(proc_t *proc) {
   for(int i = 0; i < 4; i++) {
