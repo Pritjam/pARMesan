@@ -45,8 +45,8 @@ typedef enum opcode {
   SBC,
   TEST,
   ASR,
-  MUL,
-  DIV,
+  // MUL,
+  // DIV,
   IADD,
   ISUB,
   IAND,
@@ -166,7 +166,7 @@ static opcode_t CHGSTAT_LOOKUP[8] = {HLT, EXX, EXF, EI, DI, ERR, ERR, NOP};
 */
 static opcode_t ALU_RR_LOOKUP[16] = {
   ADD,  SUB,  AND,   OR,   XOR,   CMP,   LSL,   LSR,  
-  ADC,  SBC,  TEST,  ASR,  MUL,  DIV,  ERR,  ERR};
+  ADC,  SBC,  TEST,  ASR,  ERR,  ERR,  ERR,  ERR};
 
 /**
 * Lookup table to resolve ALU_RI instructions.

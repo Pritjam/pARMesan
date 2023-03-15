@@ -118,7 +118,7 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   sigs->call = op == CALL || op == CALLR || op == RET;
 
 
-  // // consumed in Execute
+  // consumed in Execute
   // bool set_cc;
   sigs->set_cc = (op >= ADD && op <= ASR) || (op >= IADD && op <= ILSR);
 
@@ -132,18 +132,21 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
                                op == STORE || op == STSP || op == STPRE;
 
   // consumed in Writeback
-  // bool wval_1_src; // Choose where to get primary wval from
-  sigs->wval_1_src = (op >= MOVL && op <= MOV) || 
-                     (op >= ADD && op <= ILSR) || 
-                     (op >= CALL && op <= CALLR);
+  // bool wval_1_src; 
+  // Choose where to get primary wval from. If true, ex_val. Else, mem_readval.
+  sigs->wval_1_src = (op == MOVL || op == MOVH || op == MOV) || 
+                     (op >= ADD && op <= ASR) || 
+                     (op >= IADD && op <= ILSR) || 
+                     (op == CALL || op == CALLR);
 
   // bool w_enable_1;
   // If we write back to reg1 (so all data moves, loads, and alu ops)
-  sigs->w_enable_1 = op == LOAD || op == LDSP || op == LDPRE || op == LDPOST || 
-                    (op == MOVL || op == MOVH || op == MOVH) || 
-                    (op >= ADD && op <= ILSR && op != CMP && op != ICMP && op != TEST) || 
-                    (op == CALL || op == CALLR) ||
-                    (op == MOV);
+  sigs->w_enable_1 = (op == LOAD || op == LDSP || op == LDPRE || op == LDPOST) || 
+                     (op == MOVL || op == MOVH || op == MOV) || 
+                     (op >= ADD && op <= ASR && op != CMP && op != TEST) || 
+                     (op >= IADD && op <= ILSR && op != ICMP) ||
+                     (op == CALL || op == CALLR);
+
   // bool w_enable_2;
   // Only if we writeback to index register
   sigs->w_enable_2 = op == LDPRE || op == LDPOST || op == STPRE || op == STPOST;
