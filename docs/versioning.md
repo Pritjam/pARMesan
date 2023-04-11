@@ -20,7 +20,7 @@ This architecture is designed to incrementally evolve as more features are added
 - EXX, EXF instructions
 - Procedure Call Standard
 ### 1.2
-- Vector (SIMD) instructions
+- Floating Point
 - Memory save state function
 ### 1.3
 - Basic exceptions and interrupts
