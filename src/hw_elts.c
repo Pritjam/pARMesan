@@ -264,19 +264,3 @@ bool check_cond(condition_code_t cnd, flags_t flags) {
       return !flags.C;
   }
 }
-
-// WRITEBACK
-
-void swap_shadow_regs(proc_t *proc) {
-  for(int i = 0; i < 4; i++) {
-    uint16_t temp = proc->gpr_file[i];
-    proc->gpr_file[i] = proc->shadow_regs[i];
-    proc->shadow_regs[i] = temp;
-  }
-}
-
-void swap_shadow_flags(proc_t *proc) {
-  flags_t temp = proc->flags;
-  proc->flags = proc->shadow_flags;
-  proc->shadow_flags = temp;
-}

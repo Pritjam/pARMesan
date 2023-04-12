@@ -42,10 +42,8 @@ typedef enum registers {
 typedef struct proc {
   uint16_t instruction_pointer;
   uint16_t gpr_file[8];
-  uint16_t shadow_regs[4];
   // float fpr_file[8]; // might one day add floating-point support
   flags_t flags;
-  flags_t shadow_flags;
   status_t status;
   uint16_t interrupt_cause_register;
   bool interrupts_enabled;

@@ -14,9 +14,6 @@ proc_t init_proc() {
   for(int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
-  for(int i = 0; i < 4; i++) {
-    ret.shadow_regs[i] = 0;
-  }
   // initialize SP to this funky value
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
@@ -172,14 +169,6 @@ void writeback(proc_t *proc, instr_t *instr) {
   }
 
   // Make updates to state if necessary
-  if(instr->op == EXX) {
-    swap_shadow_regs(proc);
-  }
-
-  if(instr->op == EXF) {
-    swap_shadow_flags(proc);
-  }
-
   if(instr->op == HLT) {
     proc->status = STAT_HALT;
   }
