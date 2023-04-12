@@ -28,8 +28,6 @@ typedef enum opcode {
   CALL,
   CALLR,
   HLT,
-  EXX,
-  EXF,
   EI,
   DI,
   NOP,
@@ -159,7 +157,7 @@ static opcode_t TOPLEVEL_LOOKUP[32] = {
 /**
 * Lookup table to resolve CHGSTAT instructions.
 */
-static opcode_t CHGSTAT_LOOKUP[8] = {HLT, EXX, EXF, EI, DI, ERR, ERR, NOP};
+static opcode_t CHGSTAT_LOOKUP[8] = {HLT, ERR, ERR, EI, DI, ERR, ERR, NOP};
 
 /**
 * Lookup table to resolve ALU_RR instructions.
