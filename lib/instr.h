@@ -10,14 +10,20 @@ typedef enum opcode {
   CHGSTAT,
   ALU_RR,
   ALU_RI,
-  FVOP,
-  LOAD,
-  LDSP,
-  LDP,
+  FLOAT,
+  LDWPRE,
+  LDWPOST,
+  LDWSPIX,
+  LDBPRE,
+  LDBPOST,
+  LDBSPIX,
   MOVL,
-  STORE,
-  STSP,
-  STP,
+  STWPRE,
+  STWPOST,
+  STWSPIX,
+  STBPRE,
+  STBPOST,
+  STBSPIX,
   MOVH,
   MOV,
   RET,
@@ -53,10 +59,6 @@ typedef enum opcode {
   ICMP,
   ILSL,
   ILSR,
-  LDPRE,
-  LDPOST,
-  STPRE,
-  STPOST,
   ERR = -1
 } opcode_t;
 
@@ -105,6 +107,7 @@ typedef struct ctrl_sigs {
   // consumed in Memory
   bool mem_read;
   bool mem_write;
+  bool is_word;
   bool address_from_execute;
 
   // consumed in Writeback
@@ -149,10 +152,10 @@ typedef struct instr {
 * Some of these instructions are placeholders and must be resolved with resolve_opcode, like "CHGSTAT" or "ALU_RR"
 */
 static opcode_t TOPLEVEL_LOOKUP[32] = {
-    CHGSTAT,  ALU_RR,    ALU_RI,     FVOP,   LOAD, LDSP, LDP, MOVL,
-    STORE, STSP, STP, MOVH,   RET,    JCC,     MOV,       INT,
-    JMP,      JMPR,      CALL,       CALLR, ERR,     ERR,      ERR,       ERR,
-    ERR,      ERR,       ERR,        ERR,   ERR,     ERR,      ERR,       ERR};
+    CHGSTAT,  ALU_RR,    ALU_RI,     FLOAT,   LDWPRE, LDWPOST, LDWSPIX, MOVL,
+    STWPRE, STWPOST, STWSPIX, MOVH,   LDBPRE,    LDBPOST,     LDBSPIX,       ERR,
+    STBPRE,      STBPOST,      STBSPIX,       ERR, JCC,     MOV,      INT,       ERR,
+    JMP,      JMPR,       CALL,        CALLR,   ERR,     ERR,      ERR,       ERR};
 
 /**
 * Lookup table to resolve CHGSTAT instructions.
