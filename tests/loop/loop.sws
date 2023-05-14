@@ -5,7 +5,7 @@
   MOVL %ax, #5
   JMP .TEST_CND
 .LOOP_START:
-  STORE %ax, [%ix]
+  STOREW %ax, [%ix]
   SUB %ax, #1
 .TEST_CND:
   CMP %ax, #0
