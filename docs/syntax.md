@@ -14,12 +14,13 @@ In this ISA, many operands of assembly instructions involve memory or registers.
 
 ### Memory Operands
 Memory operands are specified as `[mem]`. There are 3 forms this memory operand can take:
-  - Base + Offset: `[<Rs>{, #imm}]`
-  - Pre-Indexed: `[<%ix | %sp>, #imm]!`
-  - Post-Indexed: `[<%ix | %sp>], #imm`
+  - Base + Offset: `[<%ix | %sp>{, #imm}]`
+  - Pre-Indexed: `[<Rs>, #imm]!`
+  - Post-Indexed: `[<Rs>], #imm`
+Note that only `%ix` or `%sp` can be used as the base register in Base + Offset addressing.
 
 ### Labels
-Labels (jump targets) are denoted by an identifier starting with a period, such as `.END`, `.loop1`, or `.branch4`.
+Labels (jump targets) are denoted by an identifier starting with a period, such as `.END`, `.loop1`, or `.branch4`. To define a label, write its identifier followed by a colon, such as `.END:`
 
 ---
 
