@@ -63,6 +63,7 @@ alu_op_t determine_alu_op(opcode_t op) {
 }
 
 uint16_t get_immediate(uint16_t insnbits, opcode_t op) {
+  // TODO: Implement "h" bit
   if(op >= IADD && op <= ILSR) {
     return extract_unsigned_immediate(insnbits, 3, 4);
   }
