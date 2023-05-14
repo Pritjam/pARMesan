@@ -3,11 +3,11 @@
 ; load special address into %ix and store on stack
   MOVL %ix, $69
   MOVH %ix, $69
-  STORE %ix, [%sp, #4]
+  STOREW %ix, [%sp, #4]
 ; load in pointer to block of pointers
   MOVL %ix, $00
   MOVH %ix, $10
-  STORE %ix, [%sp, #2]
+  STOREW %ix, [%sp, #2]
 ; load in ctr to 4
   MOVL %cx, #4
   MOVH %cx, #0
@@ -16,17 +16,17 @@
   J.EQ .END
   SUB %cx, #1
 ; save %cx as it is caller-saved
-  STORE %cx, [%sp]
+  STOREW %cx, [%sp]
 ; set up argument for fn call
-  LOAD %ix, [%sp, #2]
-  LOAD %ax, [%ix], #2
-  STORE %ix, [%sp, #2]
+  LOADW %ix, [%sp, #2]
+  LOADW %ax, [%ix], #2
+  STOREW %ix, [%sp, #2]
   CALL .STRLEN
 ; restore saved variable
-  LOAD %cx, [%sp]
+  LOADW %cx, [%sp]
 ; %ax now has the length of the string, we must print it
-  LOAD %ix, [%sp, #4]
-  STORE %ax, [%ix]
+  LOADW %ix, [%sp, #4]
+  STOREW %ax, [%ix]
   JMP .BODY
 .END:
   HALT
@@ -34,7 +34,7 @@
 
 .STRLEN:
 ; pointer is stored in %ax. We need to return length in %ax as well.
-  STORE %ix, [%sp, #-2]!
+  STOREW %ix, [%sp, #-2]!
   XOR %cx, %cx
   MOV %ix, %ax
   LOADB %ax, [%ix], #1
@@ -47,5 +47,5 @@
   J.NE .LOOP
 
   MOV %ax, %cx
-  LOAD %ix, [%sp], #2
+  LOADW %ix, [%sp], #2
   RET

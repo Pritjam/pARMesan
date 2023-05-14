@@ -53,20 +53,14 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->alu_op = determine_alu_op(instr->op);
   // TODO: Implement hw function for mov? Is that needed?
 
-  // determine bytewidth for mem operation (byte or word) from the "w" bit
-  int width = extract_unsigned_immediate(instr->insnbits, 10, 1);
-  instr->mem_bytewidth = width == 1 ? 2 : 1;
-
   // extract immediate
   uint16_t imm = get_immediate(instr->insnbits, instr->op);
 
   // perform register reads
   int dst = instr->ctrl_sigs.call ? REG_LR : extract_unsigned_immediate(instr->insnbits, 0, 3);
   int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
-  if(instr->op == LDSP || instr->op == STSP)
-    src = REG_SP;
-  if(instr->op == LDPOST || instr->op == LDPRE || instr->op == STPOST || instr->op == STPRE) {
-    int s = extract_unsigned_immediate(instr->insnbits, 8, 1);
+  if(instr->op == LDWSPIX || instr->op == LDBSPIX || instr->op == STWSPIX || instr->op == STBSPIX) {
+    int s = extract_unsigned_immediate(instr->insnbits, 10, 1);
     src = s == 1 ? REG_SP : REG_IX;
   }
   uint16_t dst_trf_val = proc->gpr_file[dst];
@@ -133,14 +127,13 @@ void memory(proc_t *proc, instr_t *instr) {
       sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
       log_msg(LOG_OUTPUT, msg);
     }
-    // TODO: implement handling 8-bit STOREB
-    write_mem(proc->bus, mem_address, mem_wval, instr->mem_bytewidth);
+    write_mem(proc->bus, mem_address, mem_wval, instr->ctrl_sigs.is_word);
   }
 
   // save value read in from memory into instr struct
   if(instr->ctrl_sigs.mem_read) {
     // TODO: implement handling 8-bit LOADB
-    instr->mem_readval = read_mem(proc->bus, mem_address, instr->mem_bytewidth);
+    instr->mem_readval = read_mem(proc->bus, mem_address, instr->ctrl_sigs.is_word);
   }
 }
 

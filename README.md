@@ -3,7 +3,7 @@
 ## Project Status
 The architecture specification is at version 1.1.  
 The simulator implements architecture specification 1.1. 
-The PARM File Format is currently at revision 5.  
+The PARM File Format is currently at revision 6.  
 The FETA memory image format is currently at revision 1.
 
 ## General Info

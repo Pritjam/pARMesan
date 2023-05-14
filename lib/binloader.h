@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PARM_VERSION 5
+#define PARM_VERSION 6
 #define MEMDUMP_VERSION 1
 
 // The header for a pARMesan binary file.

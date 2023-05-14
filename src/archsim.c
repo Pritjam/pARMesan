@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
     writeback(&proc, &instr);
     instructions++;
     if(instructions > INSTRUCTIONS_MAX) {
+      log_msg(LOG_WARN, "Max Cycle Count exceeded, exiting");
       break;
     }
   }

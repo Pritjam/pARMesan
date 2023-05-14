@@ -16,8 +16,6 @@ This architecture is designed to incrementally evolve as more features are added
 ### 1.0.1
 - Very basic assembler in Python, which will evolve with future versions
 ### 1.1
-- Shadow registers
-- EXX, EXF instructions
 - Procedure Call Standard
 ### 1.2
 - Floating Point

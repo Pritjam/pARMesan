@@ -11,7 +11,7 @@
   XOR %ax, %ax
 ; zero out the length counter
   XOR %cx, %cx
-  LOADB %ax [%sp], #1
+  LOADB %ax, [%sp], #1
   JMP .TEST_CND
 .LOOP_BODY:
   ADD %cx, #1
@@ -21,7 +21,7 @@
   CMP %ax, #0
   J.NE .LOOP_BODY
 ; print length of string
-  STORE %cx, [%ix]
+  STOREW %cx, [%ix]
 
 .DONE:
   HALT

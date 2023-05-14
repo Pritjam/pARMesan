@@ -19,20 +19,14 @@ void resolve_opcode(instr_t *instr) {
     uint16_t secondary_op_bits = extract_unsigned_immediate(instr->insnbits, 8, 3);
     instr->op = ALU_RI_LOOKUP[secondary_op_bits];
   }
-  if (instr->op == LDP) {
-    uint16_t h = extract_unsigned_immediate(instr->insnbits, 9, 1);
-    instr->op = h ? LDPOST : LDPRE;
-  }
-  if (instr->op == STP) {
-    uint16_t h = extract_unsigned_immediate(instr->insnbits, 9, 1);
-    instr->op = h ? STPOST : STPRE;
-  }
 }
 
 alu_op_t determine_alu_op(opcode_t op) {
   switch(op) {
-    case LOAD: case LDSP: case LDPRE: case LDPOST: 
-    case STORE: case STSP: case STPRE: case STPOST:
+    case LDWPRE: case LDWPOST: case LDWSPIX:
+    case LDBPRE: case LDBPOST: case LDBSPIX:
+    case STWPRE: case STWPOST: case STWSPIX:
+    case STBPRE: case STBPOST: case STBSPIX:
     case ADD: case IADD:
       return ALU_PLUS;
     case ADC:
@@ -69,18 +63,17 @@ alu_op_t determine_alu_op(opcode_t op) {
 }
 
 uint16_t get_immediate(uint16_t insnbits, opcode_t op) {
+  // TODO: Implement "h" bit
   if(op >= IADD && op <= ILSR) {
     return extract_unsigned_immediate(insnbits, 3, 4);
   }
 
-  if(op == LOAD || op == STORE) {
-    return extract_signed_immediate(insnbits, 6, 4);
-  }
-  if(op == LDSP || op == STSP) {
+  if(op == LDWSPIX || op == LDBSPIX || op == STWSPIX || op == STBSPIX) {
     return extract_signed_immediate(insnbits, 3, 7);
   }
-  if(op == LDPRE || op == LDPOST || op == STPRE || op == STPOST) {
-    return extract_signed_immediate(insnbits, 3, 5);
+  if(op == LDWPRE || op == LDBPRE || op == LDWPOST || op == LDBPOST ||
+     op == STWPRE || op == STBPRE || op == STWPOST || op == STBPOST) {
+    return extract_signed_immediate(insnbits, 6, 5);
   }
 
   if(op == MOVH || op == MOVL) {
@@ -108,14 +101,18 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
   // if true, val_a comes from src, else from dst
   // this is the case only in load/store instrs, as
   // the ALU source is not the same as the data source/dst.
-  sigs->val_a_sel = op == LOAD || op == LDSP || op == LDPRE || op == LDPOST ||
-                    op == STORE || op == STSP || op == STPRE || op == STPOST;
+  sigs->val_a_sel = op == LDWPRE || op == LDWPOST || op==LDWSPIX || 
+                    op == LDBPRE || op == LDBPOST || op == LDBSPIX ||
+                    op == STWPRE || op == STWPOST || op==STWSPIX || 
+                    op == STBPRE || op == STBPOST || op == STBSPIX;
   
   // bool val_b_is_imm; // if true, ALU second operand is immediate
   sigs->val_b_is_imm = (op >= IADD && op <= ILSR) || 
                     op == MOVH || op == MOVL ||
-                    op == LOAD || op == LDSP || op == LDPRE || op == LDPOST ||
-                    op == STORE || op == STSP || op == STPRE || op == STPOST;
+                    op == LDWPRE || op == LDWPOST || op==LDWSPIX || 
+                    op == LDBPRE || op == LDBPOST || op == LDBSPIX ||
+                    op == STWPRE || op == STWPOST || op==STWSPIX || 
+                    op == STBPRE || op == STBPOST || op == STBSPIX;
 
   sigs->call = op == CALL || op == CALLR || op == RET;
 
@@ -126,13 +123,17 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
   // // consumed in Memory
   // bool mem_read;
-  sigs->mem_read = op == LOAD || op == LDSP || op == LDPRE || op == LDPOST;
+  sigs->mem_read = op == LDWPRE || op == LDWPOST || op==LDWSPIX || 
+                    op == LDBPRE || op == LDBPOST || op == LDBSPIX;
   // bool mem_write;
-  sigs->mem_write = op == STORE || op == STSP || op == STPRE || op == STPOST;
-  // bool address_from_execute;
-  sigs->address_from_execute = op == LOAD || op == LDSP || op == LDPRE ||
-                               op == STORE || op == STSP || op == STPRE;
+  sigs->mem_write = op == STWPRE || op == STWPOST || op==STWSPIX || 
+                    op == STBPRE || op == STBPOST || op == STBSPIX;
 
+  sigs->is_word = op == LDWPRE || op == LDWPOST || op == LDWSPIX ||
+                  op == STWPRE || op == STWPOST || op == STWSPIX;
+  // bool address_from_execute;
+  sigs->address_from_execute = op == LDWPRE || op == LDBPRE || op == LDWSPIX || op == LDBSPIX ||
+                               op == STWPRE || op == STBPRE || op == STWSPIX || op == STBSPIX;
   // consumed in Writeback
   // bool wval_1_src; 
   // Choose where to get primary wval from. If true, ex_val. Else, mem_readval.
@@ -143,7 +144,8 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
   // bool w_enable_1;
   // If we write back to reg1 (so all data moves, loads, and alu ops)
-  sigs->w_enable_1 = (op == LOAD || op == LDSP || op == LDPRE || op == LDPOST) || 
+  sigs->w_enable_1 = op == LDWPRE || op == LDWPOST || op==LDWSPIX || 
+                     op == LDBPRE || op == LDBPOST || op == LDBSPIX || 
                      (op == MOVL || op == MOVH || op == MOV) || 
                      (op >= ADD && op <= ASR && op != CMP && op != TEST) || 
                      (op >= IADD && op <= ILSR && op != ICMP) ||
@@ -151,7 +153,8 @@ void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
 
   // bool w_enable_2;
   // Only if we writeback to index register
-  sigs->w_enable_2 = op == LDPRE || op == LDPOST || op == STPRE || op == STPOST;
+  sigs->w_enable_2 = op == LDWPRE || op == LDWPOST || op == LDBPRE || op == LDBPOST ||
+                     op == STWPRE || op == STWPOST || op == STBPRE || op == STBPOST;
 }
 
 // EXECUTE

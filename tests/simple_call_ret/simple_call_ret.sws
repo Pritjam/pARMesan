@@ -12,7 +12,7 @@
 ; add the (69 + 10) to the 5
   CALL .ADD_AX_BX
 ; print result
-  STORE %ax, [%ix]
+  STOREW %ax, [%ix]
   HALT
 
 .ADD_AX_BX:

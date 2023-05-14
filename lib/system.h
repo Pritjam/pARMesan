@@ -35,8 +35,8 @@ extern system_bus_t init_system();
 
 // For now, just use these
 
-extern uint16_t read_instr_be(system_bus_t *sys, uint16_t address, uint16_t byte_width);
-extern uint16_t read_mem(system_bus_t *sys, uint16_t address, uint16_t byte_width);
-extern void write_mem(system_bus_t *sys, uint16_t address, uint16_t value, uint16_t byte_width);
+extern uint16_t read_instr_be(system_bus_t *sys, uint16_t address, bool is_word);
+extern uint16_t read_mem(system_bus_t *sys, uint16_t address, bool is_word);
+extern void write_mem(system_bus_t *sys, uint16_t address, uint16_t value, bool is_word);
 
 #endif

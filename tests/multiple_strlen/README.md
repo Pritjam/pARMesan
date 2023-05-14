@@ -1,6 +1,6 @@
-This test is made to work with a special memory dump file. This memory dump file is constructed such that the stack contains a list of strings, and a list of pointers to these strings. In other words, a char*[]. Also on the stack is a pointer to this array. The idea is we have to traverse the array in order to read elements off of it.
+This test is made to work with a special memory dump file. This memory dump file is constructed such that the memory contains a list of strings, and a list of pointers to these strings. In other words, a char*[]. Also on the stack is a pointer to this array. The idea is we have to traverse the array in order to read elements off of it.
 
-Here's what the stack looks like:  
+Here's what the array looks like:  
 HIGH MEMORY  
 "Hello World!" '\0'  
 "Prithvi J" '\0'  
