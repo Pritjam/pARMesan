@@ -10,6 +10,7 @@ This is the official documentation for the pARMesan architecture. Contents inclu
 - [Architecture](arch.md)
 - [Instructions](instructions.md)
 - [Procedure Call Standard](pcs.md)
+- [Memory Map](mmap.md)
 
 ---
 
