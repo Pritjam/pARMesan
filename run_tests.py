@@ -59,8 +59,8 @@ for test_name in test_dirs:
   # Now to compare the output
   if filecmp.cmp(ok_file_path, outfile_path, shallow=False):
     # If they're the same:
-    print(colored("[PASS ] %s" % test_name, 'green'))
+    print(colored("[PASS] %s" % test_name, 'green'))
   else:
-    print(colored("[FAIL ] %s" % test_name, 'red'))
+    print(colored("[FAIL] %s" % test_name, 'red'))
   
 		
