@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "logging.h"
 #include "proc.h"
@@ -102,21 +103,32 @@ int main(int argc, char *argv[]) {
   }
 
 
-  int instructions = 0;
+  long instructions_executed = 0;
   
-  // main CPU loop goes here
+  // setup timer
+  struct timespec start, end;
+  clock_gettime( CLOCK_REALTIME, &start);
+
+  // main CPU loop
   while(proc.status != STAT_HALT) {
     fetch(&proc, &instr);
     decode(&proc, &instr);
     execute(&proc, &instr);
     memory(&proc, &instr);
     writeback(&proc, &instr);
-    instructions++;
-    if(instructions > INSTRUCTIONS_MAX) {
+    instructions_executed++;
+    if(instructions_executed > INSTRUCTIONS_MAX) {
       log_msg(LOG_WARN, "Max Cycle Count exceeded, exiting");
       break;
     }
   }
+
+  // Get time
+  clock_gettime( CLOCK_REALTIME, &end);
+  double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
+  char msg[120];
+  sprintf(msg, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
+  log_msg(LOG_DEBUG, msg);
 
   // closing remarks go here
   free(mem);

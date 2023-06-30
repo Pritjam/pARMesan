@@ -8,8 +8,8 @@
 
 #include "ansicolors.h"
 
-// up to 100 characters can be printed. Should fit any print.
-#define BUF_LEN 100
+// up to 1024 characters can be printed. Should fit any print.
+#define BUF_LEN 1024
 
 static char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
 
