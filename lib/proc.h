@@ -7,6 +7,10 @@
 #include <stdio.h>
 
 #include "instr.h"
+#include "bits.h"
+#include "instr.h"
+#include "logging.h"
+
 
 #define INITIAL_IP 0
 

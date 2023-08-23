@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+
+#include "logging.h"
 
 #define PARM_VERSION 6
 #define MEMDUMP_VERSION 1

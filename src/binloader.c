@@ -1,9 +1,6 @@
 #include "binloader.h"
 
-#include "logging.h"
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+
 
 void load_binary(uint8_t *emulated_mem, FILE *file) {
   parmesan_rind_t header;

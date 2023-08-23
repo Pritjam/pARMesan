@@ -1,12 +1,6 @@
 #include "logging.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <assert.h>
 
-#include "ansicolors.h"
 
 // up to 1024 characters can be printed. Should fit any print.
 #define BUF_LEN 1024

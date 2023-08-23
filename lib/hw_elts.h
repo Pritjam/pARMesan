@@ -3,6 +3,8 @@
 
 #include "instr.h"
 #include "proc.h"
+#include "bits.h"
+#include "logging.h"
 
 /**
 * Resolve a generic opcode into a more specific one, inspecting whatever bitfields are necessary.

@@ -1,6 +1,14 @@
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <assert.h>
+
+#include "ansicolors.h"
+
 #define VERBOSITY_MAX LOG_FATAL
 
 extern int global_verbosity;

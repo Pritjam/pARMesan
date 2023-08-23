@@ -1,15 +1,5 @@
 #include "archsim.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <time.h>
-
-#include "logging.h"
-#include "proc.h"
-#include "system.h"
-#include "binloader.h"
 
 #define INSTRUCTIONS_MAX 1000
 

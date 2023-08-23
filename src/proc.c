@@ -1,7 +1,5 @@
 #include "proc.h"
-#include "bits.h"
-#include "instr.h"
-#include "logging.h"
+
 #include "hw_elts.h"
 #include "system.h"
 
