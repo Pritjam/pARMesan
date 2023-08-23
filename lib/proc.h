@@ -6,12 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "system.h"
 #include "instr.h"
 
 #define INITIAL_IP 0
-
-struct system;
 
 typedef struct flags {
   bool N;
@@ -47,9 +44,6 @@ typedef struct proc {
   status_t status;
   uint16_t interrupt_cause_register;
   bool interrupts_enabled;
-
-
-  struct system *bus;
 
 } proc_t;
 

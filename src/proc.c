@@ -26,7 +26,7 @@ proc_t init_proc() {
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
   // TODO: this will one day become a general read() call
-  uint16_t insnbits = read_mem(proc->bus, proc->instruction_pointer, INSTRUCTION_WIDTH);
+  uint16_t insnbits = read_mem(proc->instruction_pointer, INSTRUCTION_WIDTH);
   instr->insnbits = insnbits;
 }
 
@@ -127,13 +127,13 @@ void memory(proc_t *proc, instr_t *instr) {
       sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
       log_msg(LOG_OUTPUT, msg);
     }
-    write_mem(proc->bus, mem_address, mem_wval, instr->ctrl_sigs.is_word);
+    write_mem(mem_address, mem_wval, instr->ctrl_sigs.is_word);
   }
 
   // save value read in from memory into instr struct
   if(instr->ctrl_sigs.mem_read) {
     // TODO: implement handling 8-bit LOADB
-    instr->mem_readval = read_mem(proc->bus, mem_address, instr->ctrl_sigs.is_word);
+    instr->mem_readval = read_mem(mem_address, instr->ctrl_sigs.is_word);
   }
 }
 
