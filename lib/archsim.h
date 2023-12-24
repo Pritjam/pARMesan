@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <pthread.h>
+
 
 #include "logging.h"
 #include "proc.h"

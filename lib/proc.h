@@ -19,6 +19,7 @@ typedef struct flags {
   bool Z;
   bool C;
   bool V;
+  bool I;
 } flags_t;
 
 typedef enum status {
@@ -47,8 +48,6 @@ typedef struct proc {
   flags_t flags;
   status_t status;
   uint16_t interrupt_cause_register;
-  bool interrupts_enabled;
-
 } proc_t;
 
 /**

@@ -69,8 +69,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-
-
   // initialize processor and link the it to guest
   proc_t proc = init_proc();
   guest.proc = &proc;
@@ -90,6 +88,8 @@ int main(int argc, char *argv[]) {
     load_memory_image(mem, memdump_file);
   }
 
+  // Now we set up the thread that manages the time
+  // the what?
 
   long instructions_executed = 0;
   

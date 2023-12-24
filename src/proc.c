@@ -9,21 +9,22 @@ proc_t init_proc() {
   ret.flags.Z = false;
   ret.flags.C = false;
   ret.flags.V = false;
+  ret.flags.I = true; // interrupts enabled by default
   for(int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
-  // initialize SP to this funky value
+  // initialize IP to this funky value
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
 
   ret.interrupt_cause_register = 0x00;
-  ret.interrupts_enabled = false;
   return ret;
 }
 
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
   // TODO: this will one day become a general read() call
+  // a read() call will then translate into a read_mem call (or be forwarded to an MMIO device depending on address)
   uint16_t insnbits = read_mem(proc->instruction_pointer, INSTRUCTION_WIDTH);
   instr->insnbits = insnbits;
 }

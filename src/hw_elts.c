@@ -207,7 +207,7 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
       break;
     case ALU_PASS_A: // pass opnd_1. Used in CALL/CALLR
       *ex_val = opnd_1;
-    case ALU_DIV: // TODO: Implement MUL and DIV
+    case ALU_DIV: // TODO: Implement MUL and DIV?
     case ALU_MUL:
     case ALU_NONE:
       break;

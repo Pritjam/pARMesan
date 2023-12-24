@@ -6,9 +6,11 @@ This is a description of the layout of memory in a running parmesan system. In r
 
 ## Summary
 
-`0x0000` to `0x007F`: 8 RST routines. Each is 16 bytes, or 8 instructions long.  
-`0x0080` to `0x00FF`: 8 Exception handlers. Each is again 16 bytes, or 8 instructions long.  
-`0x0100` to `0x01FF`: 16 INT handlers. Each is 16 bytes, or 8 instructions long.  
-`0x0200` to `0x027F`: NMI handler. 128 bytes, or 64 instructions long.  
 
-## Detailed Descriptions
+`0x0000` to `0x00FF`: These first 256 bytes contain the Interrupt Descriptor Table. Realistically, probably only the lower 32 interrupt descriptors will be loaded at any time. Still, this setup provides support for up to 128 different interrupts.
+
+TODO: Was this really stored at offset 0 on the 8086? If so, where did it start executing instructions from at boot? IDT should probably be stored elsewhere. Perhaps from `0x0100` to `0x01FF` instead. This way, the first 256 bytes of memory (a "page" as I will call it) can store some sort of reset routine.
+
+---
+
+[Table of Contents](index.md)
