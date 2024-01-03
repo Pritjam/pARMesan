@@ -45,10 +45,6 @@ for test_name in test_dirs:
     os.mkdir("output")
 
   cmd = './parmesan'
-  if len(memdump_path):
-    cmd += ' -m '
-    cmd += memdump_path
-
   cmd += ' -q -v 1 '
   cmd += path.join(test_dir_path, test_name)
   cmd += ' > '

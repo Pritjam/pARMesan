@@ -1,4 +1,4 @@
-This test is made to work with a special memory dump file. This memory dump file is constructed such that the memory contains a list of strings, and a list of pointers to these strings. In other words, a char*[]. Also on the stack is a pointer to this array. The idea is we have to traverse the array in order to read elements off of it.
+This test actually makes use of the multiple segment functionality of the WHEEL file format. There is a segment (a "wedge") that contains an array in memory as described below, as well as some code in a different wedge.
 
 Here's what the array looks like:  
 HIGH MEMORY  

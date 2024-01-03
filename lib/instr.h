@@ -132,8 +132,7 @@ typedef struct instr {
   condition_code_t cond;  // condition code for ALU to check
   int dst1;               // first writeback destination
   int dst2;               // second writeback destination
-  uint16_t branch_pc;     // next instruction address in case of a branch
-                          // (otherwise it's just sequential successor)
+  uint16_t branch_pc;     // next instruction address in case of a branch (otherwise it's just sequential successor)
   ctrl_sigs_t ctrl_sigs;  // control signals to be used for this instr
 
   // generated in Execute

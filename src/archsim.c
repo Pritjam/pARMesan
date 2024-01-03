@@ -1,4 +1,5 @@
 #include "archsim.h"
+#include "binloader.h"
 
 
 #define INSTRUCTIONS_MAX 1000
@@ -9,11 +10,11 @@ system_bus_t guest = {.memory = NULL, .proc = NULL};
 
 int main(int argc, char *argv[]) {
   int opt;
-  char *executable_filename = NULL;
-  char *memdump_filename = NULL;
+  char *wheel_filename = NULL;
+  // char *memdump_filename = NULL;
   // printf("Hello");
 
-  while ((opt = getopt(argc, argv, "v:m:hq")) != -1) {
+  while ((opt = getopt(argc, argv, "v:hq")) != -1) {
     switch (opt) {
       case 'v':
         global_verbosity = *optarg - '0';
@@ -24,25 +25,24 @@ int main(int argc, char *argv[]) {
         }
         break;
       
-      case 'm':
-        memdump_filename = (char *)malloc(strlen(optarg) + 1);
-        strcpy(memdump_filename, optarg);
-        break;
+      // case 'm':
+      //   memdump_filename = (char *)malloc(strlen(optarg) + 1);
+      //   strcpy(memdump_filename, optarg);
+      //   break;
       case 'q':
         plain_print = 1;
         break;
 
       case 'h':
       default:
-        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] [-m MEMDUMP_FILENAME] EXECUTABLE_FILENAME\n", argv[0],
-               argv[0]);
+        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] WHEEL_FILENAME\n", argv[0], argv[0]);
         exit(0);
     }
   }
 
   if (optind == argc - 1) {
-    executable_filename = (char *)malloc(strlen(argv[optind]) + 1);
-    strcpy(executable_filename, argv[optind]);
+    wheel_filename = (char *)malloc(strlen(argv[optind]) + 1);
+    strcpy(wheel_filename, argv[optind]);
   } else {
     printf(
         "Must provide exactly one filename at the end of the arguments to run "
@@ -51,23 +51,23 @@ int main(int argc, char *argv[]) {
   }
 
   // now that args are handled, we need to open the executable file
-  log_msg(LOG_INFO, "Opening binary file now");
-  FILE *assembly_file = fopen(executable_filename, "r");
-  free(executable_filename);
-  if (assembly_file == NULL) {
-    log_msg(LOG_FATAL, "Error while attempting to open assembly file. Check name or path.");
+  log_msg(LOG_INFO, "Opening wheel now");
+  FILE *wheel = fopen(wheel_filename, "r");
+  free(wheel_filename);
+  if (wheel == NULL) {
+    log_msg(LOG_FATAL, "Error while attempting to open wheel. Check name or path.");
   }
 
-  FILE *memdump_file = NULL;
-  // Next, we need to open the memory image file, if applicable
-  if(memdump_filename != NULL) {
-    log_msg(LOG_INFO, "Opening memory image file now");
-    memdump_file = fopen(memdump_filename, "r");
-    free(memdump_filename);
-    if(memdump_file == NULL) {
-      log_msg(LOG_WARN, "Error while attempting to open memory image file. Check name or path.");
-    }
-  }
+  // FILE *memdump_file = NULL;
+  // // Next, we need to open the memory image file, if applicable
+  // if(memdump_filename != NULL) {
+  //   log_msg(LOG_INFO, "Opening memory image file now");
+  //   memdump_file = fopen(memdump_filename, "r");
+  //   free(memdump_filename);
+  //   if(memdump_file == NULL) {
+  //     log_msg(LOG_WARN, "Error while attempting to open memory image file. Check name or path.");
+  //   }
+  // }
 
   // initialize processor and link the it to guest
   proc_t proc = init_proc();
@@ -82,11 +82,7 @@ int main(int argc, char *argv[]) {
 
   // any other system init tasks go here
   instr_t instr;
-  load_binary(mem, assembly_file);
-  // load memdump file if applicable
-  if(memdump_file) {
-    load_memory_image(mem, memdump_file);
-  }
+  load_wheel(mem, wheel);
 
   // Now we set up the thread that manages the time
   // the what?

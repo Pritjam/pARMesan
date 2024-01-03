@@ -12,7 +12,7 @@
 #include "logging.h"
 
 
-#define INITIAL_IP 0
+#define INITIAL_IP 0xF000
 
 typedef struct flags {
   bool N;
