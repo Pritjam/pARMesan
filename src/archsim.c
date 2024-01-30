@@ -83,6 +83,16 @@ int main(int argc, char *argv[]) {
 
   // main CPU loop
   while(proc.status != STAT_HALT) {
+    if(proc.internal_interrupt) {
+      proc.internal_interrupt = false;
+      handle_interrupt(&proc);
+    } else if(proc.interrupt_pin && proc.flags.I) {
+      // TODO: INTACK
+      // read interrupt code
+      proc.interrupt_cause_register = read_mem(PIC_MMIO_ADDRESS, true);
+      handle_interrupt(&proc);
+    }
+
     fetch(&proc, &instr);
     decode(&proc, &instr);
     execute(&proc, &instr);

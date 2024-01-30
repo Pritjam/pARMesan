@@ -21,6 +21,7 @@ typedef struct flags {
   bool C;
   bool V;
   bool I;
+  bool T;
 } flags_t;
 
 typedef enum status {
@@ -48,6 +49,8 @@ typedef struct proc {
   // float fpr_file[8]; // might one day add floating-point support
   flags_t flags;
   status_t status;
+  bool interrupt_pin;
+  bool internal_interrupt;
   uint16_t interrupt_cause_register;
 } proc_t;
 
@@ -72,5 +75,8 @@ void memory(proc_t *, instr_t *);
 
 /** Simulate one iteration of the writeback stage of the pipeline. */
 void writeback(proc_t *, instr_t *);
+
+/** Simulate handling an interrupt. */
+void handle_interrupt(proc_t *);
 
 #endif

@@ -9,13 +9,18 @@ proc_t init_proc() {
   ret.flags.Z = false;
   ret.flags.C = false;
   ret.flags.V = false;
-  ret.flags.I = true; // interrupts enabled by default
+  ret.flags.I = false; // interrupts disabled by default
+  ret.flags.T = false;
   for(int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
   // initialize IP to this funky value
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
+
+  // clear internal interrupt and interrupt pin
+  ret.internal_interrupt = 0;
+  ret.interrupt_pin = 0;
 
   ret.interrupt_cause_register = 0x00;
   return ret;
