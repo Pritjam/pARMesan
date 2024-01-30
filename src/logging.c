@@ -1,7 +1,5 @@
 #include "logging.h"
 
-
-
 // up to 1024 characters can be printed. Should fit any print.
 #define BUF_LEN 1024
 
@@ -15,21 +13,7 @@ static char *severity_colors[] = {
     ANSI_COLOR_GREEN           // regular output print
 };
 
-static char printbuf[BUF_LEN];
-
-static char *format_log_message(log_level severity, char *message) {
-  assert(strlen(severity_colors[severity]) + strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
-  sprintf(printbuf, "%s\t[%s] %s" ANSI_RESET, severity_colors[severity], severity_strs[severity], message);
-  return printbuf;
-}
-
-static char *plain_log_msg(log_level severity, char *message) {
-  assert(strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
-  sprintf(printbuf, "[%s] %s", severity_strs[severity], message);
-  return printbuf;
-}
-
-void log_msg(log_level severity, char *message) {
+void write_log(log_level severity, const char *format, ...) {
   if(severity < global_verbosity) {
     return;
   }
@@ -52,13 +36,25 @@ void log_msg(log_level severity, char *message) {
       break;
   }
 
-  if(plain_print) {
-    fprintf(out, "%s\n", plain_log_msg(severity, message));
-  } else {
-    fprintf(out, "%s\n", format_log_message(severity, message));
-  }
+  // first print color string if not plain print
+  if(!plain_print)
+    fprintf(out, "%s\t", severity_colors[severity]);
+
+  // now print severity string (and a space!)
+  fprintf(out, "[%s] ", severity_strs[severity]);
+
+  // now print/format the message
+  va_list args;
+  va_start(args, format);
+  vfprintf(out, format, args);
+  va_end(args);
+  
+  // newline and reset
+  fprintf(out, ANSI_RESET "\n");
+  
   if(do_exit) {
     exit(EXIT_FAILURE);
   }
   return;
+
 }

@@ -1,5 +1,4 @@
 #include "archsim.h"
-#include "binloader.h"
 
 
 #define INSTRUCTIONS_MAX 1000
@@ -51,23 +50,13 @@ int main(int argc, char *argv[]) {
   }
 
   // now that args are handled, we need to open the executable file
-  log_msg(LOG_INFO, "Opening wheel now");
+  write_log(LOG_INFO, "Opening wheel now");
   FILE *wheel = fopen(wheel_filename, "r");
   free(wheel_filename);
   if (wheel == NULL) {
-    log_msg(LOG_FATAL, "Error while attempting to open wheel. Check name or path.");
+    write_log(LOG_FATAL, "Error while attempting to open wheel. Check name or path.");
   }
 
-  // FILE *memdump_file = NULL;
-  // // Next, we need to open the memory image file, if applicable
-  // if(memdump_filename != NULL) {
-  //   log_msg(LOG_INFO, "Opening memory image file now");
-  //   memdump_file = fopen(memdump_filename, "r");
-  //   free(memdump_filename);
-  //   if(memdump_file == NULL) {
-  //     log_msg(LOG_WARN, "Error while attempting to open memory image file. Check name or path.");
-  //   }
-  // }
 
   // initialize processor and link the it to guest
   proc_t proc = init_proc();
@@ -76,7 +65,7 @@ int main(int argc, char *argv[]) {
   // initialize ram and link it to the sysbus (no need for encapsulation of mem within a struct)
   uint8_t *mem = (uint8_t *) calloc(ADDRESS_SPACE_SIZE, sizeof(uint8_t));
   if (mem == NULL) {
-    log_msg(LOG_FATAL, "Failed to allocate space for emulated memory");
+    write_log(LOG_FATAL, "Failed to allocate space for emulated memory");
   }
   guest.memory = mem;
 
@@ -102,7 +91,7 @@ int main(int argc, char *argv[]) {
     writeback(&proc, &instr);
     instructions_executed++;
     if(instructions_executed > INSTRUCTIONS_MAX) {
-      log_msg(LOG_WARN, "Max Cycle Count exceeded, exiting");
+      write_log(LOG_WARN, "Max Cycle Count exceeded, exiting");
       break;
     }
   }
@@ -110,13 +99,11 @@ int main(int argc, char *argv[]) {
   // Get time
   clock_gettime( CLOCK_REALTIME, &end);
   double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
-  char msg[120];
-  sprintf(msg, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
-  log_msg(LOG_DEBUG, msg);
+  write_log(LOG_DEBUG, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
 
   // closing remarks go here
   free(mem);
 
-  log_msg(LOG_INFO, "Run completed. Closing now.");
+  write_log(LOG_INFO, "Run completed. Closing now.");
 
 }

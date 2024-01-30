@@ -37,9 +37,7 @@ void decode(proc_t *proc, instr_t *instr) {
   // TODO: This will eventually become an exception when interrupts are implemented
   if(instr->op == ERR) {
     proc->status = STAT_ERR;
-    char msg[50];
-    sprintf(msg, "Undefined opcode 0x%x", top_level_op_bits);
-    log_msg(LOG_FATAL, msg);
+    write_log(LOG_FATAL, "Undefined opcode 0x%x", top_level_op_bits);
   }
 
   // resolve actual opcode for those that require it
@@ -109,22 +107,20 @@ void memory(proc_t *proc, instr_t *instr) {
   if(mem_address == 0) {
     // Mem address of zero could be indicative of a problem.
     if(instr->ctrl_sigs.mem_read) {
-      log_msg(LOG_WARN, "Null pointer read attempt");
+      write_log(LOG_WARN, "Null pointer read attempt");
     }
     if(instr->ctrl_sigs.mem_write) {
-      log_msg(LOG_WARN, "Null pointer write attempt");
+      write_log(LOG_WARN, "Null pointer write attempt");
     }
   }
   
   if(instr->ctrl_sigs.mem_read && instr->ctrl_sigs.mem_write) {
-    log_msg(LOG_WARN, "Simultaneous load and store");
+    write_log(LOG_WARN, "Simultaneous load and store");
   }
   if(instr->ctrl_sigs.mem_write) {
     // TODO: This needs to be reworked for a neater system eventually
     if(mem_address == MMIO_PRINT_ADDRESS) {
-      char msg[40];
-      sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
-      log_msg(LOG_OUTPUT, msg);
+      write_log(LOG_OUTPUT, "0x%04X %d", mem_wval, mem_wval);
     }
     write_mem(mem_address, mem_wval, instr->ctrl_sigs.is_word);
   }

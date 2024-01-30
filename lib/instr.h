@@ -83,12 +83,6 @@ typedef enum alu_op {
   ALU_ERR = -1
 } alu_op_t;
 
-// this isn't currently used
-// typedef enum wval_src {
-//   ALU_OUTPUT,
-//   VAL_MEM,
-//   SEQUENTIAL_SUCCESSOR
-// } wval_src_t;
 
 typedef struct ctrl_sigs {
   // consumed in Decode
@@ -145,11 +139,11 @@ typedef struct instr {
 } instr_t;
 
 /**
-* Lookup table for top-level opcodes.
-* A mapping from the first 5 bits of an instruction to the corresponding opcode.
-* Also called an "itable".
-* Some of these instructions are placeholders and must be resolved with resolve_opcode, like "CHGSTAT" or "ALU_RR"
-*/
+ * Lookup table for top-level opcodes.
+ * A mapping from the first 5 bits of an instruction to the corresponding opcode.
+ * Also called an "itable".
+ * Some of these instructions are placeholders and must be resolved with resolve_opcode, like "CHGSTAT" or "ALU_RR"
+ */
 static opcode_t TOPLEVEL_LOOKUP[32] = {
     CHGSTAT,  ALU_RR,    ALU_RI,     FLOAT,   LDWPRE, LDWPOST, LDWSPIX, MOVL,
     STWPRE, STWPOST, STWSPIX, MOVH,   LDBPRE,    LDBPOST,     LDBSPIX,       ERR,
@@ -157,20 +151,20 @@ static opcode_t TOPLEVEL_LOOKUP[32] = {
     JMP,      JMPR,       CALL,        CALLR,   ERR,     ERR,      ERR,       ERR};
 
 /**
-* Lookup table to resolve CHGSTAT instructions.
-*/
+ * Lookup table to resolve CHGSTAT instructions.
+ */
 static opcode_t CHGSTAT_LOOKUP[8] = {HLT, RET, ERR, EI, DI, ERR, ERR, NOP};
 
 /**
-* Lookup table to resolve ALU_RR instructions.
-*/
+ * Lookup table to resolve ALU_RR instructions.
+ */
 static opcode_t ALU_RR_LOOKUP[16] = {
   ADD,  SUB,  AND,   OR,   XOR,   CMP,   LSL,   LSR,  
   ADC,  SBC,  TEST,  ASR,  ERR,  ERR,  ERR,  ERR};
 
 /**
-* Lookup table to resolve ALU_RI instructions.
-*/
+ * Lookup table to resolve ALU_RI instructions.
+ */
 static opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR, IXOR, ICMP, ILSL, ILSR};
 
 #endif

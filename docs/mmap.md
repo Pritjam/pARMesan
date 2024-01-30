@@ -6,10 +6,15 @@ This is a description of the layout of memory in a running parmesan system. In r
 
 ## Summary
 
+`0x0000` to `0x00FF`: These first 256 bytes contain the Interrupt Descriptor Table. Realistically, probably only the lower 32 interrupt descriptors (64 bytes) will be used at any time. Still, this setup provides support for up to 128 different interrupts.
 
-`0x0000` to `0x00FF`: These first 256 bytes contain the Interrupt Descriptor Table. Realistically, probably only the lower 32 interrupt descriptors will be loaded at any time. Still, this setup provides support for up to 128 different interrupts.
+`0xF000` to `0xFFFF`: System BIOS ROM. This ROM contains all BIOS subroutines and system calls.
 
-TODO: Was this really stored at offset 0 on the 8086? If so, where did it start executing instructions from at boot? IDT should probably be stored elsewhere. Perhaps from `0x0100` to `0x01FF` instead. This way, the first 256 bytes of memory (a "page" as I will call it) can store some sort of reset routine.
+On the 8086, the IDT started at offset 0. The 8086 began executing instructions from address `0xFFFF0`, starting a long tradition of somewhat janky address manipulation at boot to start executing code from "16 bytes below the highest address possible on the system". 
+
+In our system, we will begin execution at `0xF000`. This corresponds to 4K less than the upper address limit, or the 60KiB mark. BIOS will be mapped to this area.
+
+There will likely also be 4K of video memory, to be determined more exactly at a later date. This will probably start at `0xE000`. The video system will be similar to the Monochrome Display Adaptor from the IBM PC.
 
 ---
 

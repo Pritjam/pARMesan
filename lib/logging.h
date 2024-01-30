@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #include "ansicolors.h"
 
@@ -15,7 +16,7 @@ extern int global_verbosity;
 extern int plain_print;
 
 
-/* This enum represents the various levels used by the logging system. */
+/** This enum represents the various levels used by the logging system. */
 typedef enum {
   LOG_DEBUG,      // Debug messages (specifically for debugging)
   LOG_INFO,       // Info messages (startup, loading, etc)
@@ -26,12 +27,14 @@ typedef enum {
 } log_level;
 
 /**
-* Log a message to the console.
-* Uses the global variable global_verbosity to filter logs that don't meet the verbosity threshold.
-* Also uses the global variable plain_print to determine if color formatting is to be used.
-* @param lvl the log level to use, such as LOG_INFO or LOG_FATAL
-* @param msg a pointer to the message to log.
-*/
-extern void log_msg(log_level lvl, char *msg);
+ * Log a message. Uses the global_verbosity to filter out logs that don't meet the threshold.
+ * Uses global variable plain_print to determine if color formatting is to be used.
+ * This is a variadic function, so you can add as many arguments as needed provided there's a spot in the format string.
+ * 
+ * @param severity the logging level to use, like LOG_INFO or LOG_FATAL
+ * @param format the format string for the message
+ * @param args as this is a variadic function, extra arguments can be provided.
+ */
+void write_log(log_level severity, const char *format, ...);
 
 #endif

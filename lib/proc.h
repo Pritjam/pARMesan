@@ -12,6 +12,7 @@
 #include "logging.h"
 
 
+
 #define INITIAL_IP 0xF000
 
 typedef struct flags {
@@ -51,18 +52,25 @@ typedef struct proc {
 } proc_t;
 
 /**
-* Construct and initialize a processor to default values.
-* @return a new proc_t instance with default values.
-*/
+ * Construct and initialize a processor to default values.
+ * 
+ * @return a new proc_t instance with default values.
+ */
 proc_t init_proc();
 
-/**
-* Functions that simulate the 5 stages of the pipeline.
-*/
+/** Simulate one iteration of the fetch stage of the pipeline. */
 void fetch(proc_t *, instr_t *);
+
+/** Simulate one iteration of the decode stage of the pipeline. */
 void decode(proc_t *, instr_t *);
+
+/** Simulate one iteration of the execute stage of the pipeline. */
 void execute(proc_t *, instr_t *);
+
+/** Simulate one iteration of the memory stage of the pipeline. */
 void memory(proc_t *, instr_t *);
+
+/** Simulate one iteration of the writeback stage of the pipeline. */
 void writeback(proc_t *, instr_t *);
 
 #endif

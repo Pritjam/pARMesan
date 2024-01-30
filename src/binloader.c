@@ -11,16 +11,12 @@ void load_wheel(uint8_t *emulated_mem, FILE *file) {
     char temp[5];
     strncpy(temp, header.magic_identifier, 4);
     temp[4] = 0;
-    char msg[80];
-    sprintf(msg, "Bad file header for wheel! Found %s, expected `whee`.", temp);
-    log_msg(LOG_FATAL, msg);
+    write_log(LOG_FATAL, "Bad file header for wheel! Found %s, expected `whee`.", temp);
   }
 
   // check version number
   if(header.version != WHEEL_VERSION) {
-    char msg[70];
-    sprintf(msg, "Bad file version for memdump file! Found %d, expected %d.", header.version, WHEEL_VERSION);
-    log_msg(LOG_FATAL, msg);
+    write_log(LOG_FATAL, "Bad file version for memdump file! Found %d, expected %d.", header.version, WHEEL_VERSION);
   }
 
   // If both version number and magic identifier worked out:
