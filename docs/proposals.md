@@ -22,7 +22,7 @@ FLOP  00011 01 --- --- ---
   FSUB   00011 01 001 src dst
   FMUL   00011 01 010 src dst
   FDIV   00011 01 011 src dst
-  UNUSED 00011 01 100 --- ---
+  UNUSED 00011 01 100 --- --- // FLOAD const? for 1.0, -1.0, 0.0, etc
   UNUSED 00011 01 101 --- ---
   UNUSED 00011 01 110 --- ---
 

@@ -1,7 +1,6 @@
 import sys
 import os
 import os.path as path
-import colorama
 from termcolor import colored
 import filecmp
 
@@ -21,7 +20,6 @@ if "--all" in sys.argv:
 else:
   test_dirs = [sys.argv[1]]
 
-colorama.init()
 
 for test_name in test_dirs:
   test_dir_path = path.join("tests", test_name)
@@ -34,10 +32,6 @@ for test_name in test_dirs:
     print(colored("[ERROR] Correct output file for test %s not found" % test_name, "yellow",))
     continue
 
-  memdump_path = path.join(test_dir_path, test_name + ".feta")
-  
-  if not path.exists(memdump_path):
-    memdump_path = ""
 
   outfile_path = path.join("output", test_name + ".out")
 

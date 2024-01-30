@@ -57,7 +57,6 @@ int main(int argc, char *argv[]) {
     write_log(LOG_FATAL, "Error while attempting to open wheel. Check name or path.");
   }
 
-
   // initialize processor and link the it to guest
   proc_t proc = init_proc();
   guest.proc = &proc;
