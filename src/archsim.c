@@ -1,6 +1,5 @@
 #include "archsim.h"
 
-
 #define INSTRUCTIONS_MAX 1000
 
 int global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
@@ -15,27 +14,27 @@ int main(int argc, char *argv[]) {
 
   while ((opt = getopt(argc, argv, "v:hq")) != -1) {
     switch (opt) {
-      case 'v':
-        global_verbosity = *optarg - '0';
-        global_verbosity = VERBOSITY_MAX - global_verbosity;
-        if (global_verbosity < 0 || global_verbosity > VERBOSITY_MAX) {
-          printf("Verbosity must be at least 0 and at most %d\n", VERBOSITY_MAX);
-          exit(-1);
-        }
-        break;
-      
-      // case 'm':
-      //   memdump_filename = (char *)malloc(strlen(optarg) + 1);
-      //   strcpy(memdump_filename, optarg);
-      //   break;
-      case 'q':
-        plain_print = 1;
-        break;
+    case 'v':
+      global_verbosity = *optarg - '0';
+      global_verbosity = VERBOSITY_MAX - global_verbosity;
+      if (global_verbosity < 0 || global_verbosity > VERBOSITY_MAX) {
+        printf("Verbosity must be at least 0 and at most %d\n", VERBOSITY_MAX);
+        exit(-1);
+      }
+      break;
 
-      case 'h':
-      default:
-        printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] WHEEL_FILENAME\n", argv[0], argv[0]);
-        exit(0);
+    // case 'm':
+    //   memdump_filename = (char *)malloc(strlen(optarg) + 1);
+    //   strcpy(memdump_filename, optarg);
+    //   break;
+    case 'q':
+      plain_print = 1;
+      break;
+
+    case 'h':
+    default:
+      printf("Usage: \n\t%s [-h]\n\t%s [-v VERBOSITY] WHEEL_FILENAME\n", argv[0], argv[0]);
+      exit(0);
     }
   }
 
@@ -62,7 +61,7 @@ int main(int argc, char *argv[]) {
   guest.proc = &proc;
 
   // initialize ram and link it to the sysbus (no need for encapsulation of mem within a struct)
-  uint8_t *mem = (uint8_t *) calloc(ADDRESS_SPACE_SIZE, sizeof(uint8_t));
+  uint8_t *mem = (uint8_t *)calloc(ADDRESS_SPACE_SIZE, sizeof(uint8_t));
   if (mem == NULL) {
     write_log(LOG_FATAL, "Failed to allocate space for emulated memory");
   }
@@ -76,17 +75,17 @@ int main(int argc, char *argv[]) {
   // the what?
 
   long instructions_executed = 0;
-  
+
   // setup timer
   struct timespec start, end;
-  clock_gettime( CLOCK_REALTIME, &start);
+  clock_gettime(CLOCK_REALTIME, &start);
 
   // main CPU loop
-  while(proc.status != STAT_HALT) {
-    if(proc.internal_interrupt) {
+  while (proc.status != STAT_HALT) {
+    if (proc.internal_interrupt) {
       proc.internal_interrupt = false;
       handle_interrupt(&proc);
-    } else if(proc.interrupt_pin && proc.flags.I) {
+    } else if (proc.interrupt_pin && proc.flags.I) {
       // TODO: INTACK
       // read interrupt code
       proc.interrupt_cause_register = read_mem(PIC_MMIO_ADDRESS, true);
@@ -99,14 +98,14 @@ int main(int argc, char *argv[]) {
     memory(&proc, &instr);
     writeback(&proc, &instr);
     instructions_executed++;
-    if(instructions_executed > INSTRUCTIONS_MAX) {
+    if (instructions_executed > INSTRUCTIONS_MAX) {
       write_log(LOG_WARN, "Max Cycle Count exceeded, exiting");
       break;
     }
   }
 
   // Get time
-  clock_gettime( CLOCK_REALTIME, &end);
+  clock_gettime(CLOCK_REALTIME, &end);
   double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
   write_log(LOG_DEBUG, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
 
@@ -114,5 +113,4 @@ int main(int argc, char *argv[]) {
   free(mem);
 
   write_log(LOG_INFO, "Run completed. Closing now.");
-
 }

@@ -6,38 +6,38 @@
 static char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
 
 static char *severity_colors[] = {
-    ANSI_COLOR_MAGENTA,        // debug
-    ANSI_COLOR_CYAN,           // info
-    ANSI_COLOR_YELLOW,         // warn
-    ANSI_BOLD ANSI_COLOR_RED,  // fatal
-    ANSI_COLOR_GREEN           // regular output print
+    ANSI_COLOR_MAGENTA,       // debug
+    ANSI_COLOR_CYAN,          // info
+    ANSI_COLOR_YELLOW,        // warn
+    ANSI_BOLD ANSI_COLOR_RED, // fatal
+    ANSI_COLOR_GREEN          // regular output print
 };
 
 void write_log(log_level severity, const char *format, ...) {
-  if(severity < global_verbosity) {
+  if (severity < global_verbosity) {
     return;
   }
   FILE *out;
   bool do_exit = false;
   switch (severity) {
-    case LOG_DEBUG:
-    case LOG_INFO:
-    case LOG_WARN:
-      out = stdout;
-      break;
-    case LOG_FATAL:
-      do_exit = true;
-      out = stderr;
-      break;
-    case LOG_OUTPUT:
-      out = stdout;  // might be changed to a file at some point?
-      break;
-    case LOG_OTHER:
-      break;
+  case LOG_DEBUG:
+  case LOG_INFO:
+  case LOG_WARN:
+    out = stdout;
+    break;
+  case LOG_FATAL:
+    do_exit = true;
+    out = stderr;
+    break;
+  case LOG_OUTPUT:
+    out = stdout; // might be changed to a file at some point?
+    break;
+  case LOG_OTHER:
+    break;
   }
 
   // first print color string if not plain print
-  if(!plain_print)
+  if (!plain_print)
     fprintf(out, "%s\t", severity_colors[severity]);
 
   // now print severity string (and a space!)
@@ -48,13 +48,16 @@ void write_log(log_level severity, const char *format, ...) {
   va_start(args, format);
   vfprintf(out, format, args);
   va_end(args);
-  
+
   // newline and reset
-  fprintf(out, ANSI_RESET "\n");
-  
-  if(do_exit) {
+  if (!plain_print)
+    fprintf(out, ANSI_RESET "\n");
+  else
+   fprintf(out, "\n");
+
+  if (do_exit) {
+    // TODO: Should do cleanup of some sort? perhaps unnecessary since it's a hard exit anyway
     exit(EXIT_FAILURE);
   }
   return;
-
 }
