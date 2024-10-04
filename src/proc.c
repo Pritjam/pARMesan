@@ -1,7 +1,5 @@
 #include "proc.h"
-#include "bits.h"
-#include "instr.h"
-#include "logging.h"
+
 #include "hw_elts.h"
 #include "system.h"
 
@@ -11,21 +9,27 @@ proc_t init_proc() {
   ret.flags.Z = false;
   ret.flags.C = false;
   ret.flags.V = false;
-  for(int i = 0; i < 8; i++) {
+  ret.flags.I = false; // interrupts disabled by default
+  ret.flags.T = false;
+  for (int i = 0; i < 8; i++) {
     ret.gpr_file[i] = 0;
   }
-  // initialize SP to this funky value
+  // initialize IP to this funky value
   ret.instruction_pointer = INITIAL_IP;
   ret.status = STAT_OK;
 
+  // clear internal interrupt and interrupt pin
+  ret.internal_interrupt = 0;
+  ret.interrupt_pin = 0;
+
   ret.interrupt_cause_register = 0x00;
-  ret.interrupts_enabled = false;
   return ret;
 }
 
 void fetch(proc_t *proc, instr_t *instr) {
   // read instruction into instr object
   // TODO: this will one day become a general read() call
+  // a read() call will then translate into a read_mem call (or be forwarded to an MMIO device depending on address)
   uint16_t insnbits = read_mem(proc->instruction_pointer, INSTRUCTION_WIDTH);
   instr->insnbits = insnbits;
 }
@@ -36,11 +40,9 @@ void decode(proc_t *proc, instr_t *instr) {
   instr->op = TOPLEVEL_LOOKUP[top_level_op_bits];
 
   // TODO: This will eventually become an exception when interrupts are implemented
-  if(instr->op == ERR) {
+  if (instr->op == ERR) {
     proc->status = STAT_ERR;
-    char msg[50];
-    sprintf(msg, "Undefined opcode 0x%x", top_level_op_bits);
-    log_msg(LOG_FATAL, msg);
+    write_log(LOG_FATAL, "Undefined opcode 0x%x", top_level_op_bits);
   }
 
   // resolve actual opcode for those that require it
@@ -59,7 +61,7 @@ void decode(proc_t *proc, instr_t *instr) {
   // perform register reads
   int dst = instr->ctrl_sigs.call ? REG_LR : extract_unsigned_immediate(instr->insnbits, 0, 3);
   int src = extract_unsigned_immediate(instr->insnbits, 3, 3);
-  if(instr->op == LDWSPIX || instr->op == LDBSPIX || instr->op == STWSPIX || instr->op == STBSPIX) {
+  if (instr->op == LDWSPIX || instr->op == LDBSPIX || instr->op == STWSPIX || instr->op == STBSPIX) {
     int s = extract_unsigned_immediate(instr->insnbits, 10, 1);
     src = s == 1 ? REG_SP : REG_IX;
   }
@@ -83,16 +85,15 @@ void decode(proc_t *proc, instr_t *instr) {
     instr->opnd_1 = proc->instruction_pointer + INSTRUCTION_WIDTH;
 
   // calculate branch PC
-  if(instr->op == JMP || instr->op == JCC || instr->op == CALL) {
+  if (instr->op == JMP || instr->op == JCC || instr->op == CALL) {
     instr->branch_pc = proc->instruction_pointer + imm * 2;
-  } else if(instr->op == JMPR || instr->op == CALLR || instr->op == RET) {
+  } else if (instr->op == JMPR || instr->op == CALLR || instr->op == RET) {
     // after all, a RET is the same as `JMPR %lr`
     instr->branch_pc = dst_trf_val;
   }
 
   // generate condition code
   instr->cond = extract_unsigned_immediate(instr->insnbits, 8, 3);
-
 }
 
 void execute(proc_t *proc, instr_t *instr) {
@@ -100,38 +101,35 @@ void execute(proc_t *proc, instr_t *instr) {
   run_alu(instr->opnd_1, instr->opnd_2, instr->alu_op, instr->ctrl_sigs.set_cc, &instr->ex_val, &proc->flags);
   // determine if condition holds
   instr->cond_holds = check_cond(instr->cond, proc->flags);
-
 }
 
 void memory(proc_t *proc, instr_t *instr) {
   uint16_t mem_wval = instr->mem_writeval;
   // make a call to memory function, or just write memory
   uint16_t mem_address = instr->ctrl_sigs.address_from_execute ? instr->ex_val : instr->opnd_1;
-  if(mem_address == 0) {
+  if (mem_address == 0) {
     // Mem address of zero could be indicative of a problem.
-    if(instr->ctrl_sigs.mem_read) {
-      log_msg(LOG_WARN, "Null pointer read attempt");
+    if (instr->ctrl_sigs.mem_read) {
+      write_log(LOG_WARN, "Null pointer read attempt");
     }
-    if(instr->ctrl_sigs.mem_write) {
-      log_msg(LOG_WARN, "Null pointer write attempt");
+    if (instr->ctrl_sigs.mem_write) {
+      write_log(LOG_WARN, "Null pointer write attempt");
     }
   }
-  
-  if(instr->ctrl_sigs.mem_read && instr->ctrl_sigs.mem_write) {
-    log_msg(LOG_WARN, "Simultaneous load and store");
+
+  if (instr->ctrl_sigs.mem_read && instr->ctrl_sigs.mem_write) {
+    write_log(LOG_WARN, "Simultaneous load and store");
   }
-  if(instr->ctrl_sigs.mem_write) {
+  if (instr->ctrl_sigs.mem_write) {
     // TODO: This needs to be reworked for a neater system eventually
-    if(mem_address == MMIO_PRINT_ADDRESS) {
-      char msg[40];
-      sprintf(msg, "0x%04X %d", mem_wval, mem_wval);
-      log_msg(LOG_OUTPUT, msg);
+    if (mem_address == MMIO_PRINT_ADDRESS) {
+      write_log(LOG_OUTPUT, "0x%04X %d", mem_wval, mem_wval);
     }
     write_mem(mem_address, mem_wval, instr->ctrl_sigs.is_word);
   }
 
   // save value read in from memory into instr struct
-  if(instr->ctrl_sigs.mem_read) {
+  if (instr->ctrl_sigs.mem_read) {
     // TODO: implement handling 8-bit LOADB
     instr->mem_readval = read_mem(mem_address, instr->ctrl_sigs.is_word);
   }
@@ -142,28 +140,31 @@ void writeback(proc_t *proc, instr_t *instr) {
   uint16_t primary_wval = instr->ctrl_sigs.wval_1_src ? instr->ex_val : instr->mem_readval;
   uint16_t secondary_wval = instr->ex_val;
 
-  if(instr->ctrl_sigs.w_enable_1) {
+  if (instr->ctrl_sigs.w_enable_1) {
     proc->gpr_file[instr->dst1] = primary_wval;
   }
-  if(instr->ctrl_sigs.w_enable_2) {
+  if (instr->ctrl_sigs.w_enable_2) {
     proc->gpr_file[instr->dst2] = secondary_wval;
   }
 
   // choose next IP (sequential or branch)
-  if(instr->op >= JMP && instr->op <= CALLR) {
+  if (instr->op >= JMP && instr->op <= CALLR) {
     // JMP, JMPR, CALL, CALLR
     proc->instruction_pointer = instr->branch_pc;
-  } else if(instr->op == RET) {
+  } else if (instr->op == RET) {
     proc->instruction_pointer = instr->branch_pc;
-  } else if(instr->op == JCC && instr->cond_holds) {
+  } else if (instr->op == JCC && instr->cond_holds) {
     proc->instruction_pointer = instr->branch_pc;
   } else {
     proc->instruction_pointer += INSTRUCTION_WIDTH;
   }
 
   // Make updates to state if necessary
-  if(instr->op == HLT) {
+  if (instr->op == HLT) {
     proc->status = STAT_HALT;
   }
 }
 
+void handle_interrupt(proc_t *proc) {
+  return;
+}

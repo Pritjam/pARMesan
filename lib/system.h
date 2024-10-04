@@ -7,6 +7,7 @@
 #include "proc.h"
 
 #define MMIO_PRINT_ADDRESS 0x6969
+#define PIC_MMIO_ADDRESS 0xDFF0
 
 // To be added when we start implementing IO, bus, peripherals:
 // typedef struct mmio_block {

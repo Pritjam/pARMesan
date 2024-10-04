@@ -1,6 +1,7 @@
 parmesan
 .vscode/
 .clangd
+.clang-format
 TODO.md
 
 output

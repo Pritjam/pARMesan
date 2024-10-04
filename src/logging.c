@@ -1,69 +1,62 @@
 #include "logging.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <assert.h>
-
-#include "ansicolors.h"
-
 // up to 1024 characters can be printed. Should fit any print.
 #define BUF_LEN 1024
 
 static char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
 
 static char *severity_colors[] = {
-    ANSI_COLOR_MAGENTA,        // debug
-    ANSI_COLOR_CYAN,           // info
-    ANSI_COLOR_YELLOW,         // warn
-    ANSI_BOLD ANSI_COLOR_RED,  // fatal
-    ANSI_COLOR_GREEN           // regular output print
+    ANSI_COLOR_MAGENTA,       // debug
+    ANSI_COLOR_CYAN,          // info
+    ANSI_COLOR_YELLOW,        // warn
+    ANSI_BOLD ANSI_COLOR_RED, // fatal
+    ANSI_COLOR_GREEN          // regular output print
 };
 
-static char printbuf[BUF_LEN];
-
-static char *format_log_message(log_level severity, char *message) {
-  assert(strlen(severity_colors[severity]) + strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
-  sprintf(printbuf, "%s\t[%s] %s" ANSI_RESET, severity_colors[severity], severity_strs[severity], message);
-  return printbuf;
-}
-
-static char *plain_log_msg(log_level severity, char *message) {
-  assert(strlen(severity_strs[severity]) + strlen(message) < BUF_LEN);
-  sprintf(printbuf, "[%s] %s", severity_strs[severity], message);
-  return printbuf;
-}
-
-void log_msg(log_level severity, char *message) {
-  if(severity < global_verbosity) {
+void write_log(log_level severity, const char *format, ...) {
+  if (severity < global_verbosity) {
     return;
   }
   FILE *out;
   bool do_exit = false;
   switch (severity) {
-    case LOG_DEBUG:
-    case LOG_INFO:
-    case LOG_WARN:
-      out = stdout;
-      break;
-    case LOG_FATAL:
-      do_exit = true;
-      out = stderr;
-      break;
-    case LOG_OUTPUT:
-      out = stdout;  // might be changed to a file at some point?
-      break;
-    case LOG_OTHER:
-      break;
+  case LOG_DEBUG:
+  case LOG_INFO:
+  case LOG_WARN:
+    out = stdout;
+    break;
+  case LOG_FATAL:
+    do_exit = true;
+    out = stderr;
+    break;
+  case LOG_OUTPUT:
+    out = stdout; // might be changed to a file at some point?
+    break;
+  case LOG_OTHER:
+    break;
   }
 
-  if(plain_print) {
-    fprintf(out, "%s\n", plain_log_msg(severity, message));
-  } else {
-    fprintf(out, "%s\n", format_log_message(severity, message));
-  }
-  if(do_exit) {
+  // first print color string if not plain print
+  if (!plain_print)
+    fprintf(out, "%s\t", severity_colors[severity]);
+
+  // now print severity string (and a space!)
+  fprintf(out, "[%s] ", severity_strs[severity]);
+
+  // now print/format the message
+  va_list args;
+  va_start(args, format);
+  vfprintf(out, format, args);
+  va_end(args);
+
+  // newline and reset
+  if (!plain_print)
+    fprintf(out, ANSI_RESET "\n");
+  else
+   fprintf(out, "\n");
+
+  if (do_exit) {
+    // TODO: Should do cleanup of some sort? perhaps unnecessary since it's a hard exit anyway
     exit(EXIT_FAILURE);
   }
   return;

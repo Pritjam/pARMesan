@@ -7,14 +7,21 @@
 #include <stdio.h>
 
 #include "instr.h"
+#include "bits.h"
+#include "instr.h"
+#include "logging.h"
 
-#define INITIAL_IP 0
+
+
+#define INITIAL_IP 0xF000
 
 typedef struct flags {
   bool N;
   bool Z;
   bool C;
   bool V;
+  bool I;
+  bool T;
 } flags_t;
 
 typedef enum status {
@@ -42,24 +49,34 @@ typedef struct proc {
   // float fpr_file[8]; // might one day add floating-point support
   flags_t flags;
   status_t status;
+  bool interrupt_pin;
+  bool internal_interrupt;
   uint16_t interrupt_cause_register;
-  bool interrupts_enabled;
-
 } proc_t;
 
 /**
-* Construct and initialize a processor to default values.
-* @return a new proc_t instance with default values.
-*/
+ * Construct and initialize a processor to default values.
+ * 
+ * @return a new proc_t instance with default values.
+ */
 proc_t init_proc();
 
-/**
-* Functions that simulate the 5 stages of the pipeline.
-*/
+/** Simulate one iteration of the fetch stage of the pipeline. */
 void fetch(proc_t *, instr_t *);
+
+/** Simulate one iteration of the decode stage of the pipeline. */
 void decode(proc_t *, instr_t *);
+
+/** Simulate one iteration of the execute stage of the pipeline. */
 void execute(proc_t *, instr_t *);
+
+/** Simulate one iteration of the memory stage of the pipeline. */
 void memory(proc_t *, instr_t *);
+
+/** Simulate one iteration of the writeback stage of the pipeline. */
 void writeback(proc_t *, instr_t *);
+
+/** Simulate handling an interrupt. */
+void handle_interrupt(proc_t *);
 
 #endif
