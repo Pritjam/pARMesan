@@ -212,7 +212,7 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     break;
   case ALU_MOVL:
     opnd_1 &= 0xFF00;                   // clear out low byte
-    *ex_val = opnd_1 | opnd_2 & 0x00FF; // apply low byte
+    *ex_val = opnd_1 | (opnd_2 & 0x00FF); // apply low byte
     break;
   case ALU_MOVH:
     opnd_1 &= 0x00FF;               // clear out high byte
@@ -279,5 +279,8 @@ bool check_cond(condition_code_t cnd, flags_t flags) {
     return flags.C;
   case CC:
     return !flags.C;
+  default:
+    write_log(LOG_FATAL, "Unknown condition code checked in check_cond.");
+    return false;
   }
 }

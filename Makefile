@@ -1,18 +1,21 @@
-define newline
+CC = gcc
+CC_FLAGS = -Wall -ggdb -Ilib 
+RM = rm -f
 
 
-endef
+all: tidy parmesan clean
 
-all: clean build
+parmesan:
+	(cd src && make $@)
+	${CC} ${CC_FLAGS} -o parmesan src/*.o
 
-build:
-	@gcc -O3 -I lib lib/*.h src/*.c -o parmesan
+tidy:
+	$(RM) parmesan
 
-debug: 
-	@gcc -g -I lib lib/*.h src/*.c -o parmesan
 clean:
-	@rm -f parmesan *.bak
-	@rm -rf output/
+	(cd src && make $@)
+	$(RM) *.bak
+	$(RM) output/
 
-evaluate: clean build
-	@python3 run_tests.py --all
+evaluate: tidy parmesan clean
+	python3 run_tests.py --all

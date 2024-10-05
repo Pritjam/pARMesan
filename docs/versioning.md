@@ -18,17 +18,15 @@ This architecture is designed to incrementally evolve as more features are added
 ### 1.1
 - Procedure Call Standard
 ### 1.2
-- Floating Point
-- Memory save state function
+- Interrupt/Exception System
 ### 1.3
 - Basic exceptions and interrupts
-### 1.4 (OPTIONAL)
+
+## Simulator Features to Implement:
 - Pipelined implementation, with forwarding and hazard control
-### 2.0
 - System Bus-based architecture
 - Memory on System Bus
 - IO support
-### 2.1
 - Hard Disk (IDE or something) support
 - Rework interrupts to use threads and mpsc channels
 - PIC
