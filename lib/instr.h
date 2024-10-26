@@ -146,7 +146,7 @@ typedef struct instr {
  * opcode. Also called an "itable". Some of these instructions are placeholders
  * and must be resolved with resolve_opcode, like "CHGSTAT" or "ALU_RR"
  */
-static opcode_t TOPLEVEL_LOOKUP[32] = {
+static const opcode_t TOPLEVEL_LOOKUP[32] = {
     CHGSTAT, ALU_RR,  ALU_RI,  FLOAT, LDWPRE, LDWPOST, LDWSPIX, MOVL,
     STWPRE,  STWPOST, STWSPIX, MOVH,  LDBPRE, LDBPOST, LDBSPIX, ERR,
     STBPRE,  STBPOST, STBSPIX, ERR,   JCC,    MOV,     INT,     ERR,
@@ -155,18 +155,18 @@ static opcode_t TOPLEVEL_LOOKUP[32] = {
 /**
  * Lookup table to resolve CHGSTAT instructions.
  */
-static opcode_t CHGSTAT_LOOKUP[8] = {HLT, RET, ERR, EI, DI, ERR, ERR, NOP};
+static const opcode_t CHGSTAT_LOOKUP[8] = {HLT, RET, ERR, EI, DI, ERR, ERR, NOP};
 
 /**
  * Lookup table to resolve ALU_RR instructions.
  */
-static opcode_t ALU_RR_LOOKUP[16] = {ADD, SUB, AND,  OR,  XOR, CMP, LSL, LSR,
+static const opcode_t ALU_RR_LOOKUP[16] = {ADD, SUB, AND,  OR,  XOR, CMP, LSL, LSR,
                                      ADC, SBC, TEST, ASR, ERR, ERR, ERR, ERR};
 
 /**
  * Lookup table to resolve ALU_RI instructions.
  */
-static opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR,
+static const opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR,
                                     IXOR, ICMP, ILSL, ILSR};
 
 #endif

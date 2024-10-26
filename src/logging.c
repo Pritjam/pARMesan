@@ -11,9 +11,9 @@
 // up to 1024 characters can be printed. Should fit any print.
 #define BUF_LEN 1024
 
-static char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
+const char *severity_strs[] = {"DEBUG", "INFO", "WARN", "FATAL", "OUTPUT"};
 
-static char *severity_colors[] = {
+const char *severity_colors[] = {
     ANSI_COLOR_MAGENTA,       // debug
     ANSI_COLOR_CYAN,          // info
     ANSI_COLOR_YELLOW,        // warn

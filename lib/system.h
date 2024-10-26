@@ -24,13 +24,13 @@ typedef struct system {
 extern system_bus_t guest;
 
 // To be added when we start implementing IO, bus, peripherals:
-// extern uint16_t read(uint16_t address, bool is_word));
-// extern void write(uint16_t address, uint16_t value, bool is_word));
+// uint16_t read(uint16_t address, bool is_word));
+// void write(uint16_t address, uint16_t value, bool is_word));
 
 // For now, just use these
 
-extern uint16_t read_instr_be(uint16_t address, bool is_word);
-extern uint16_t read_mem(uint16_t address, bool is_word);
-extern void write_mem(uint16_t address, uint16_t value, bool is_word);
+uint16_t read_instr_be(uint16_t address, bool is_word);
+uint16_t read_mem(uint16_t address, bool is_word);
+void write_mem(uint16_t address, uint16_t value, bool is_word);
 
 #endif

@@ -11,7 +11,7 @@
  * @param width the number of bits to extract
  * @return an unsigned integer with value equal to that of the extracted bitfield
  */
-static uint16_t extract_unsigned_immediate(uint16_t srcbits, int from, int width) {
+inline uint16_t extract_unsigned_immediate(uint16_t srcbits, int from, int width) {
   srcbits >>= from;
   unsigned mask = (1 << width) - 1;
   return srcbits & mask;
@@ -25,7 +25,7 @@ static uint16_t extract_unsigned_immediate(uint16_t srcbits, int from, int width
  * @param width the number of bits to extract
  * @return an unsigned integer with value equal to that of the extracted bitfield in twos-complement representation.
  */
-static uint16_t extract_signed_immediate(uint16_t srcbits, int from, int width) {
+inline uint16_t extract_signed_immediate(uint16_t srcbits, int from, int width) {
   uint16_t unsigned_imm = extract_unsigned_immediate(srcbits, from, width);
   // now we have to sign extend that
   unsigned_imm <<= (16 - width);

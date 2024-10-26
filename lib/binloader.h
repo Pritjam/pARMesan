@@ -27,6 +27,6 @@ typedef struct wheel_header {
  * @param emulated_mem a pointer to the monolithic array of emulated memory
  * @param file a FILE pointer to the WHEEL file
  */
-extern void load_wheel(uint8_t *emulated_mem, FILE *file);
+void load_wheel(uint8_t *emulated_mem, FILE *file);
 
 #endif
