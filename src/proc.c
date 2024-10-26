@@ -5,6 +5,7 @@
 #include "instr.h"
 #include "logging.h"
 #include "system.h"
+#include "vct.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -47,6 +48,7 @@ void decode(proc_t *proc, instr_t *instr) {
   // TODO: This will eventually become an exception when interrupts are implemented
   if (instr->op == ERR) {
     proc->status = STAT_ERR;
+    track_status(STAT_ERR);
     write_log(LOG_FATAL, "Undefined opcode 0x%x", top_level_op_bits);
   }
 
@@ -146,9 +148,11 @@ void writeback(proc_t *proc, instr_t *instr) {
 
   if (instr->ctrl_sigs.w_enable_1) {
     proc->gpr_file[instr->dst1] = primary_wval;
+    track_reg(instr->dst1, primary_wval);
   }
   if (instr->ctrl_sigs.w_enable_2) {
     proc->gpr_file[instr->dst2] = secondary_wval;
+    track_reg(instr->dst2, secondary_wval);
   }
 
   // choose next IP (sequential or branch)
@@ -162,9 +166,12 @@ void writeback(proc_t *proc, instr_t *instr) {
     proc->instruction_pointer += INSTRUCTION_WIDTH;
   }
 
+  track_reg(REG_PC, proc->instruction_pointer);
+
   // Make updates to state if necessary
   if (instr->op == HLT) {
     proc->status = STAT_HALT;
+    track_status(STAT_HALT);
   }
 }
 

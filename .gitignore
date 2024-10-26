@@ -3,6 +3,8 @@ parmesan
 .clangd
 .clang-format
 TODO.md
+*.o
+*.vct
 
 output
 

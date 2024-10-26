@@ -1,4 +1,5 @@
 #include "system.h"
+#include "vct.h"
 #include <stdint.h>
 
 // BIG ENDIAN FORMS
@@ -29,7 +30,9 @@ void write_mem(uint16_t address, uint16_t value, bool is_word) {
   uint8_t high = (value >> 8) & 0xFF;
 
   guest.memory[address] = low;
+  track_mem(address, low);
   if (is_word) {
     guest.memory[address + 1] = high;
+    track_mem(address + 1, high);
   }
 }

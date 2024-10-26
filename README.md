@@ -4,6 +4,7 @@
 The architecture specification is at version 1.1.  
 The simulator implements architecture specification 1.1. 
 The WHEEL file format is currently at revision 1.
+The VCT file format is currently at revision 1.
 
 The PARM and FETA formats are deprecated.
 

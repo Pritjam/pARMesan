@@ -2,6 +2,7 @@
 #include "bits.h"
 
 #include "logging.h"
+#include "vct.h"
 
 // DECODE
 
@@ -262,6 +263,7 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     bool C = (*ex_val >> 15) == 1;
     flags->V = (A && B && !C) || (!A && !B && C);
   }
+  track_flags(*flags);
 }
 
 bool check_cond(condition_code_t cnd, flags_t flags) {

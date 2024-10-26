@@ -45,7 +45,7 @@ void write_log(log_level severity, const char *format, ...) {
 
   // first print color string if not plain print
   if (!plain_print)
-    fprintf(out, "%s\t", severity_colors[severity]);
+    fprintf(out, "%s", severity_colors[severity]);
 
   // now print severity string (and a space!)
   fprintf(out, "[%s] ", severity_strs[severity]);

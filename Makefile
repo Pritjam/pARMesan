@@ -14,7 +14,7 @@ tidy:
 
 clean:
 	(cd src && make $@)
-	$(RM) *.bak
+	$(RM) *.bak *.vct
 	$(RM) -r output/
 
 evaluate: tidy parmesan clean

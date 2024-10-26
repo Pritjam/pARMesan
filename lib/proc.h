@@ -6,13 +6,15 @@
 #define INITIAL_IP 0xF000
 
 typedef struct flags {
-  bool N;
-  bool Z;
-  bool C;
   bool V;
+  bool C;
+  bool Z;
+  bool N;
   bool I;
   bool T;
 } flags_t;
+
+#define PACK_FLAGS(flags) (flags.T << 5) | (flags.I << 4) | (flags.N << 3) | (flags.Z << 2) | (flags.C << 1) | flags.V
 
 typedef enum status {
   STAT_OK,
@@ -22,6 +24,8 @@ typedef enum status {
   STAT_ERR
 } status_t;
 
+#define PACK_PSW(flags, status) PACK_FLAGS(flags) << 8 | status
+
 typedef enum registers {
   REG_AX,
   REG_BX,
@@ -30,7 +34,8 @@ typedef enum registers {
   REG_IX,
   REG_BP,
   REG_SP,
-  REG_LR
+  REG_LR,
+  REG_PC
 } registers_t;
 
 typedef struct proc {
