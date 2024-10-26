@@ -1,4 +1,14 @@
 #include "archsim.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+#include "binloader.h"
+#include "logging.h"
+#include "proc.h"
+#include "system.h"
 
 #define INSTRUCTIONS_MAX 1000
 
@@ -9,8 +19,6 @@ system_bus_t guest = {.memory = NULL, .proc = NULL};
 int main(int argc, char *argv[]) {
   int opt;
   char *wheel_filename = NULL;
-  // char *memdump_filename = NULL;
-  // printf("Hello");
 
   while ((opt = getopt(argc, argv, "v:hq")) != -1) {
     switch (opt) {
@@ -23,10 +31,6 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-    // case 'm':
-    //   memdump_filename = (char *)malloc(strlen(optarg) + 1);
-    //   strcpy(memdump_filename, optarg);
-    //   break;
     case 'q':
       plain_print = 1;
       break;
@@ -107,7 +111,7 @@ int main(int argc, char *argv[]) {
   // Get time
   clock_gettime(CLOCK_REALTIME, &end);
   double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1000000000.0;
-  write_log(LOG_DEBUG, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
+  write_log(LOG_INFO, "Time taken to run program: %f seconds.\n\tInstructions executed: %ld.\n\tInstructions per second: %f.", elapsed, instructions_executed, instructions_executed / elapsed);
 
   // closing remarks go here
   free(mem);

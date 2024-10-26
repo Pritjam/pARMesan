@@ -1,4 +1,5 @@
 #include "system.h"
+#include <stdint.h>
 
 // BIG ENDIAN FORMS
 // TODO: Rewrite assembler so that instructions are stored in little endian.
@@ -14,12 +15,11 @@ uint16_t read_instr_be(uint16_t address, bool is_word) {
   return low | (high << 8);
 }
 
-
 // TODO: Start using little endian forms (this requires a rewrite of the assembler)
 // LITTLE ENDIAN FORMS
 uint16_t read_mem(uint16_t address, bool is_word) {
   uint16_t low = guest.memory[address];
-  uint16_t high = is_word? guest.memory[address + 1] : 0;
+  uint16_t high = is_word ? guest.memory[address + 1] : 0;
 
   return low | (high << 8);
 }

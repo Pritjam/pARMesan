@@ -1,5 +1,13 @@
 #include "logging.h"
 
+#include <assert.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "ansicolors.h"
+
 // up to 1024 characters can be printed. Should fit any print.
 #define BUF_LEN 1024
 
@@ -30,9 +38,8 @@ void write_log(log_level severity, const char *format, ...) {
     out = stderr;
     break;
   case LOG_OUTPUT:
+  default:
     out = stdout; // might be changed to a file at some point?
-    break;
-  case LOG_OTHER:
     break;
   }
 
@@ -53,7 +60,7 @@ void write_log(log_level severity, const char *format, ...) {
   if (!plain_print)
     fprintf(out, ANSI_RESET "\n");
   else
-   fprintf(out, "\n");
+    fprintf(out, "\n");
 
   if (do_exit) {
     // TODO: Should do cleanup of some sort? perhaps unnecessary since it's a hard exit anyway

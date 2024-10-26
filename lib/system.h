@@ -1,9 +1,6 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include "proc.h"
 
 #define MMIO_PRINT_ADDRESS 0x6969
@@ -27,10 +24,8 @@ typedef struct system {
 extern system_bus_t guest;
 
 // To be added when we start implementing IO, bus, peripherals:
-// extern uint16_t read_16(uint16_t address);
-// extern uint8_t read_8(uint16_t address);
-// extern void write_16(uint16_t address, uint16_t value);
-// extern void write_8(uint16_t address, uint8_t value);
+// extern uint16_t read(uint16_t address, bool is_word));
+// extern void write(uint16_t address, uint16_t value, bool is_word));
 
 // For now, just use these
 

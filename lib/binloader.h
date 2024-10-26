@@ -3,11 +3,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-
-#include "logging.h"
 
 #define MEMDUMP_VERSION 1
 #define WHEEL_VERSION 1
@@ -17,7 +12,6 @@ typedef struct wedge_header {
   uint16_t length;
   uint32_t checksum; // currently unimplemented, but might eventually be
 } wedge_header_t;
-
 
 // NEW STUFF: Unified format for storing a memory image. This is the first iteration of the "wheel" format.
 typedef struct wheel_header {
@@ -29,7 +23,7 @@ typedef struct wheel_header {
 
 /**
  * Load the system emulated memory, given a FILE pointer to the WHEEL file to load.
- * 
+ *
  * @param emulated_mem a pointer to the monolithic array of emulated memory
  * @param file a FILE pointer to the WHEEL file
  */

@@ -1,17 +1,7 @@
 #ifndef _PROC_H_
 #define _PROC_H_
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "instr.h"
-#include "bits.h"
-#include "instr.h"
-#include "logging.h"
-
-
 
 #define INITIAL_IP 0xF000
 
@@ -56,7 +46,7 @@ typedef struct proc {
 
 /**
  * Construct and initialize a processor to default values.
- * 
+ *
  * @return a new proc_t instance with default values.
  */
 proc_t init_proc();

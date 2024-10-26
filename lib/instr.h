@@ -1,12 +1,13 @@
 #ifndef _INSTR_H_
 #define _INSTR_H_
 
-#include <stdbool.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define INSTRUCTION_WIDTH 2
 
 typedef enum opcode {
+  ERR = 0,
   CHGSTAT,
   ALU_RR,
   ALU_RI,
@@ -58,11 +59,11 @@ typedef enum opcode {
   IXOR,
   ICMP,
   ILSL,
-  ILSR,
-  ERR = -1
+  ILSR
 } opcode_t;
 
 typedef enum alu_op {
+  ALU_ERR = 0,
   ALU_PLUS,
   ALU_MINUS,
   ALU_AND,
@@ -79,8 +80,7 @@ typedef enum alu_op {
   ALU_MOVH,
   ALU_PASS_B,
   ALU_PASS_A,
-  ALU_NONE,
-  ALU_ERR = -1
+  ALU_NONE
 } alu_op_t;
 
 typedef struct ctrl_sigs {

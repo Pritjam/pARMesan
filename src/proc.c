@@ -1,7 +1,12 @@
 #include "proc.h"
 
+#include "bits.h"
 #include "hw_elts.h"
+#include "instr.h"
+#include "logging.h"
 #include "system.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 proc_t init_proc() {
   proc_t ret;
@@ -130,7 +135,6 @@ void memory(proc_t *proc, instr_t *instr) {
 
   // save value read in from memory into instr struct
   if (instr->ctrl_sigs.mem_read) {
-    // TODO: implement handling 8-bit LOADB
     instr->mem_readval = read_mem(mem_address, instr->ctrl_sigs.is_word);
   }
 }
@@ -148,8 +152,7 @@ void writeback(proc_t *proc, instr_t *instr) {
   }
 
   // choose next IP (sequential or branch)
-  if (instr->op >= JMP && instr->op <= CALLR) {
-    // JMP, JMPR, CALL, CALLR
+  if (instr->op == JMP || instr->op == JMPR || instr->op == CALL || instr->op == CALLR) {
     proc->instruction_pointer = instr->branch_pc;
   } else if (instr->op == RET) {
     proc->instruction_pointer = instr->branch_pc;

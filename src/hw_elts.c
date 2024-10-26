@@ -1,4 +1,7 @@
 #include "hw_elts.h"
+#include "bits.h"
+
+#include "logging.h"
 
 // DECODE
 
@@ -111,7 +114,7 @@ uint16_t get_immediate(uint16_t insnbits, opcode_t op) {
 }
 
 void populate_control_signals(ctrl_sigs_t *sigs, opcode_t op) {
-  // // consumed in Decode
+  // consumed in Decode
   // bool val_a_sel;
   // if true, val_a comes from src, else from dst
   // this is the case only in load/store instrs, as
@@ -211,7 +214,7 @@ void run_alu(uint16_t opnd_1, uint16_t opnd_2, alu_op_t alu_op, bool set_cc, uin
     *ex_val = (uint16_t)(((int16_t)opnd_1) >> opnd_2);
     break;
   case ALU_MOVL:
-    opnd_1 &= 0xFF00;                   // clear out low byte
+    opnd_1 &= 0xFF00;                     // clear out low byte
     *ex_val = opnd_1 | (opnd_2 & 0x00FF); // apply low byte
     break;
   case ALU_MOVH:

@@ -3,10 +3,9 @@
 
 #include <stdint.h>
 
-
 /**
  * Extract a bitfield from an integer.
- * 
+ *
  * @param srcbits the uint16 from which to extract bits.
  * @param from the bit-offset to start extracting bits at (inclusive)
  * @param width the number of bits to extract
@@ -18,10 +17,9 @@ static uint16_t extract_unsigned_immediate(uint16_t srcbits, int from, int width
   return srcbits & mask;
 }
 
-
 /**
  * Extract a bitfield from an integer, sign-extending if necessary
- * 
+ *
  * @param srcbits the uint16 from which to extract bits.
  * @param from the bit-offset to start extracting bits at (inclusive)
  * @param width the number of bits to extract

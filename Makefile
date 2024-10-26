@@ -1,5 +1,5 @@
 CC = gcc
-CC_FLAGS = -Wall -ggdb -Ilib 
+CC_FLAGS = -O3 -Wall -ggdb -Ilib 
 RM = rm -f
 
 
@@ -15,7 +15,7 @@ tidy:
 clean:
 	(cd src && make $@)
 	$(RM) *.bak
-	$(RM) output/
+	$(RM) -r output/
 
 evaluate: tidy parmesan clean
 	python3 run_tests.py --all
