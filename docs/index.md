@@ -11,6 +11,8 @@ This is the official documentation for the pARMesan architecture. Contents inclu
 - [Instructions](instructions.md)
 - [Procedure Call Standard](pcs.md)
 - [Memory Map](mmap.md)
+- [Value Change Trace](vct.md)
+- [WHEEL file format](wheel.md)
 
 ---
 
