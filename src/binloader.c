@@ -30,6 +30,7 @@ void load_wheel(uint8_t *emulated_mem, FILE *file) {
 
   // If both version number and magic identifier worked out:
   // we are ready to start reading memory
+  write_log(LOG_DEBUG, "Reading segments now. Found %d segments.", header.num_of_segments);
   wedge_header_t segment;
 
   for (int i = 0; i < header.num_of_segments; i++) {

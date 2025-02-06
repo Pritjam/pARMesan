@@ -4,12 +4,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MEMDUMP_VERSION 1
-#define WHEEL_VERSION 1
+#define WHEEL_VERSION 2
 
 typedef struct wedge_header {
   uint16_t start_address;
-  uint16_t length;
+  uint16_t length; // stores length - 1. This is because a zero-length segment makes no sense, but a 64K-length one does.
   uint32_t checksum; // currently unimplemented, but might eventually be
 } wedge_header_t;
 

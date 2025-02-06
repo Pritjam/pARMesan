@@ -1,5 +1,5 @@
 CC = gcc
-CC_FLAGS = -O3 -Wall -ggdb -I../lib 
+CC_FLAGS = -Wextra -Werror -Wall -ggdb -I../lib -Wno-unused
 CC_OPTIONS = -c
 RM = rm -f
 MD = gccmakedep

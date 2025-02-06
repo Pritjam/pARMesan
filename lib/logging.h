@@ -3,7 +3,6 @@
 
 #define VERBOSITY_MAX LOG_FATAL
 
-extern int global_verbosity;
 extern int plain_print;
 
 /**
@@ -19,6 +18,7 @@ typedef enum {
   LOG_OUTPUT, // Program output
 } log_level;
 
+extern log_level global_verbosity;
 /**
  * Log a message. Uses the global_verbosity to filter out logs that don't meet the threshold.
  * Uses global variable plain_print to determine if color formatting is to be used.

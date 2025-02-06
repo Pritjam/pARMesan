@@ -13,7 +13,7 @@
 
 #define INSTRUCTIONS_MAX 1000
 
-int global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
+log_level global_verbosity = LOG_INFO; // by default, messages of INFO severity and higher will be logged
 int plain_print = 0;
 bool do_vct = false; // by default don't bother with vct
 system_bus_t guest = {.memory = NULL, .proc = NULL};
