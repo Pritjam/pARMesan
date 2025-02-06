@@ -10,7 +10,7 @@ Similar to the x86 architecture, we have an Interrupt Vector Table (IVT) that st
 
 ### Interrupt Handling Process
 
-The first step is different for exceptions and interrupts. For an interrupt, the processor interrupt pin is triggered. If interrupts are disabled, no further handling takes place. Otherwise, the processor reads the interrupt number from the defined MMIO address for the PIC, similar to the Intel 8259 PIC used in the IBM PC. This interrupt number is stored in the Interrupt Number Register, where it will be used in the more general exception handler. Then, the interrupt pending flag is set in the processor.
+The first step is different for exceptions and interrupts. For an interrupt, the processor interrupt pin is triggered. If interrupts are disabled, no further handling takes place. Otherwise, the processor issues an INTACK signal, prompting the interrupt controller (most likely something similar to the Intel 8259A PIC) to provide an interrupt vector number on the bus. This interrupt number is stored in the Interrupt Number Register, where it will be used in the more general exception handler.
 
 In the case of an exception or a software-triggered interrupt, the interrupt number is already known, so this step is not necessary. The Interrupt Number Register would have already been set by the excepting instruction. Again, if interrupts are disabled, no further handling takes place.
 

@@ -1,11 +1,11 @@
 # pARMesan Documentation
 
 ## Instructions
+WORK IN PROGRESS--Temporary Article
 
-## WORK IN PROGRESS--Temporary Article
 In general, instructions fall into a few categories: ALU, Data Movement, Memory, and Control Transfer. Live document with some more information can be found [here](https://docs.google.com/document/d/1DgnzGgg6i8BBU9w-XBLziPraKPNcnVzqKxEwDsCbySo)
 
-### ALU Instructions
+## ALU Instructions
 ALU operations have Register-Register variants and Register-Immediate variants. Instructions that take an immediate are limited to 4-bit immediates.
 
 #### Register-Register ALU Instructions:
@@ -32,7 +32,10 @@ ALU operations have Register-Register variants and Register-Immediate variants. 
 - LSL  Rd, #imm4
 - LSR  Rd, #imm4
 
-### Data Movement
+## Data Movement
+
+### Register Moves
+
 There are 3 Data Movement instructions. Two are used to load the low and high byte of a register, respectively. The last is used to transfer data between registers.
 - MOVL Rd, #imm8
 - MOVH Rd, #imm8
@@ -56,7 +59,7 @@ Memory is accessed in granularity of Bytes or Words (16 bits).
 
 An important caveat for memory addressing: Only registers `%sp` and `%ix` can be used in Base + Offset addressing. In other words, all other GPRs (`%ax`, `%bx`, etc) can only be used in Pre- or Post-Indexed addressing, while `%sp` and `%ix` can be used in all three addressing modes.
 
-### Control Transfer
+## Control Transfer
 There are a few options for control transfer. Jumps and Calls can be direct (to a label) or indirect (to a register). Conditional jumps can only be direct.
 - JMP  .LABEL
 - JMP  Rd

@@ -27,21 +27,20 @@ FLOP  00011 01 --- --- ---
   UNUSED 00011 01 110 --- ---
 
   // Unary FP Ops
-  FNEG   00011 01 111 000 dst
+  FNEG   00011 01 111 000 dst // -x
   FABS   00011 01 111 001 dst
   FSIN   00011 01 111 010 dst
   FCOS   00011 01 111 011 dst
   FTAN   00011 01 111 100 dst
   FLOG   00011 01 111 101 dst // natural log
-  FINV   00011 01 111 110 dst
+  FINV   00011 01 111 110 dst // 1/x
   FSQURT 00011 01 111 111 dst
 ```
 
-### Extended Register Operations
-Instructions that make use of register pairs, like the 8080's `BC`, `DE`, and `HL` register pairs. This would allow for 32-bit computing, extended integer precision, or larger SIMD operations.
+### I/O
 
-### Memory Segmentation
-Rework the memory architecture to use segmentation, as introduced with the 8086, to expand addressable range. There's probably better ways of going about this than the 8086 did, since that implementation allowed multiple segment + address pairs to map to the same physical address.
+How might I/O work? TBD.
+
 
 ---
 
