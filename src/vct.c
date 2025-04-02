@@ -59,6 +59,7 @@ void track_status(status_t new_status) {
 }
 
 void track_reg(uint8_t index, uint16_t value) {
+  // if we've already tracked a change in this register, this cycle:
   for (int i = 0; i < modified_regs; i++) {
     if (reg_indices[i] == index) {
       reg_values[i] = value;
@@ -67,6 +68,8 @@ void track_reg(uint8_t index, uint16_t value) {
   }
 
   // we don't already have a mapping for this reg change, so make one
+
+  // we can only track 7 register changes
   if (modified_regs > 7) {
     write_log(LOG_WARN, "Attempted to track more than 7 register changes. Trying to track %d.", modified_regs);
     return;
@@ -84,7 +87,7 @@ void track_mem(uint16_t address, uint8_t value) {
     }
   }
 
-  // we don't already have a mapping for this reg change, so make one
+  // we don't already have a mapping for this memory change, so make one
   if (modified_mems > 15) {
     write_log(LOG_WARN, "Attempted to track more than 15 memory changes. Trying to track %d.", modified_mems);
     return;

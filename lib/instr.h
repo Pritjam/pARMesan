@@ -160,13 +160,13 @@ static const opcode_t CHGSTAT_LOOKUP[8] = {HLT, RET, ERR, EI, DI, ERR, ERR, NOP}
 /**
  * Lookup table to resolve ALU_RR instructions.
  */
-static const opcode_t ALU_RR_LOOKUP[16] = {ADD, SUB, AND,  OR,  XOR, CMP, LSL, LSR,
-                                     ADC, SBC, TEST, ASR, ERR, ERR, ERR, ERR};
+static const opcode_t ALU_RR_LOOKUP[16] = {ADD, SUB, AND, OR, XOR, CMP, LSL, LSR,
+                                           ADC, SBC, TEST, ASR, ERR, ERR, ERR, ERR};
 
 /**
  * Lookup table to resolve ALU_RI instructions.
  */
 static const opcode_t ALU_RI_LOOKUP[8] = {IADD, ISUB, IAND, IOR,
-                                    IXOR, ICMP, ILSL, ILSR};
+                                          IXOR, ICMP, ILSL, ILSR};
 
 #endif
