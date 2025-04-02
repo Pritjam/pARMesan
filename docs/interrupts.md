@@ -2,7 +2,7 @@
 
 ## Interrupts
 
-The pARMesan ISA supports interrupts and exceptions. Internally, both are handled the same way. Semantically, the difference is that exceptions are triggered internally, such as from a processor error state or undefined instruction, while interrupts are triggered externally, from the processor interrupt pin. Additionally, interrupts can be triggered by the `INT` instruction.
+The pARMesan ISA supports interrupts and exceptions. Internally, both are handled the same way. Semantically, the difference is that exceptions are triggered internally, such as from a processor error state or undefined instruction, while interrupts are triggered externally, from a processor interrupt pin. Additionally, interrupts can be triggered by the `INT` instruction.
 
 ### Interrupt Vector Table
 
