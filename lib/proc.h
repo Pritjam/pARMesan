@@ -14,8 +14,9 @@ typedef struct flags {
   bool T;
 } flags_t;
 
-#define PACK_FLAGS(flags) (flags.T << 5) | (flags.I << 4) | (flags.N << 3) | (flags.Z << 2) | (flags.C << 1) | flags.V
+#define PACK_FLAGS(flags) ((flags.T << 5) | (flags.I << 4) | (flags.N << 3) | (flags.Z << 2) | (flags.C << 1) | flags.V)
 
+#define PACK_PSW(flags, status) (PACK_FLAGS(flags) << 8 | status)
 typedef enum status {
   STAT_OK,
   STAT_INTERRUPT,
@@ -24,7 +25,6 @@ typedef enum status {
   STAT_ERR
 } status_t;
 
-#define PACK_PSW(flags, status) PACK_FLAGS(flags) << 8 | status
 
 typedef enum registers {
   REG_AX,

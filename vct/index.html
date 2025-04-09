@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>pARMesan Trace Viewer</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+
+        #state-display {
+            margin-top: 1em;
+            white-space: pre;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 1em;
+        }
+
+        .controls {
+            margin-top: 1em;
+        }
+
+        button {
+            margin-right: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>pARMesan VCT Viewer</h1>
+
+    <input type="file" id="traceFileInput" accept=".vct">
+    <div class="controls">
+        <button id="prevBtn" disabled>Previous</button>
+        <button id="nextBtn" disabled>Next</button>
+        <span id="cycleCounter"></span>
+    </div>
+
+    <div id="state-display">
+        Load a trace file to begin.
+    </div>
+
+    <div id="error-message" style="color: red; font-weight: bold; margin-top: 1em;"></div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

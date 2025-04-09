@@ -13,7 +13,7 @@ static status_t status = STAT_OK;
 static uint8_t reg_indices[8] = {0};
 static uint16_t reg_values[8] = {0};
 static uint16_t mem_locations[16] = {0};
-static uint16_t mem_values[16] = {0};
+static uint8_t mem_values[16] = {0};
 
 void initialize_vct(FILE *out, flags_t initial_flags, status_t initial_status) {
   out_file = out;
@@ -98,6 +98,7 @@ void track_mem(uint16_t address, uint8_t value) {
 }
 
 void finalize_cycle() {
+  write_log(LOG_DEBUG, "finalizing");
   if (!do_vct) {
     modified_psw = false;
     modified_regs = 0;
